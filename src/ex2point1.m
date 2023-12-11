@@ -1,10 +1,12 @@
 % Use 1000 equispaced points on the interval [-1,1].
-t = linspace(-1, 1, 1000);
+t = linspace(-2, 2, 1000);
 
 % Sample a smooth function
 y = abs(t) .*(2+cos(t)) .* sign(t);
 % Try a non-smooth function also:
 % y = abs(t) .* exp(t)
+
+%% decontruct signal
 
 % Compute its wavelet transform, four levels deep, using the Daubechies 2
 % wavelet.
@@ -15,6 +17,10 @@ y = abs(t) .*(2+cos(t)) .* sign(t);
 % try to understand the different results.
 figure
 semilogy(abs(c));
+xlabel("$i$",Interpreter="latex");
+ylabel("$|c_i|$",Interpreter="latex");
+
+%% recontruct signal
 
 % Find small coefficents and set them to zero.
 T = max(abs(c));
