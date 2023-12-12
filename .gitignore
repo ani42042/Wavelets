@@ -1,1 +1,8 @@
 src/*.asv
+report/*.aux
+report/*.bcf
+report/*.log
+report/*.out
+report/*.xml
+report/*.gz
+report/*.toc
