@@ -44,8 +44,8 @@ delta = 1e-1;
 
 % change here what thresholding method wanted
 cnoiseInit = cnoise;
-[cnoise,I] = Hard_threshold(delta,cnoise);
-%[cnoise,I] = Soft_threshold(delta,cnoise);
+%[cnoise,I] = Hard_threshold(delta,cnoise);
+[cnoise,I] = Soft_threshold(delta,cnoise);
 
 % How many coefficients did we put to zero:
 length(I)
@@ -89,8 +89,8 @@ errorMat = zeros(length(t),length(deltaList))';
 errorCoeffList = zeros(size(deltaList));
 for i = 1:length(deltaList)
     delta = deltaList(i);
-    [cnoise,I] = Hard_threshold(delta,cnoiseInit);
-    %[cnoise,I] = Soft_threshold(delta,cnoise);
+    %[cnoise,I] = Hard_threshold(delta,cnoiseInit);
+    [cnoise,I] = Soft_threshold(delta,cnoise);
     
     errorCoeffList(i) = mse(c,cnoise);
     % Reconstruct the signal
