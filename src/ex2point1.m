@@ -24,7 +24,8 @@ ylabel("$|c_i|$",Interpreter="latex");
 % apply wavelet transform on signal with added noise
 rng(42)
 epsilon = 1e-1;
-ynoise = y + epsilon*rand(size(y));
+noise = epsilon*rand(size(y));
+ynoise = y + noise;
 [cnoise,lnoise] = wavedec(ynoise, 5, 'db2');
 
 figure
@@ -42,6 +43,7 @@ legend("$f(t)$","$f(t)+\epsilon \mathcal{U}(0,1)$",Interpreter="latex")
 delta = 1e-1;
 
 % change here what thresholding method wanted
+cnoiseInit = cnoise;
 [cnoise,I] = Hard_threshold(delta,cnoise);
 %[cnoise,I] = Soft_threshold(delta,cnoise);
 
@@ -63,27 +65,57 @@ ylabel("$|c_i-\hat{c}_i|$",Interpreter="latex");
 y2 = waverec(cnoise, lnoise, 'db2');
 % Plot the error on a logarithmic scale. Experiment with the threshold
 % above and see what the effect is
-err = abs(y-y2);
-noise = mean(abs(y-ynoise));
+bias = mean(noise); %mean of uniform distrubution
+%noiseMean = mean(abs(noise));
+err = abs(y-y2+bias);
 errTotal = norm(err)
-errTotalnoise = norm(abs(y-ynoise))
+errTotalnoise = norm(noise)
 figure
 semilogy(t, err)
 hold on
 %semilogy(t, noise)
-yline(noise,Label="noise",Interpreter="latex")
+yline(bias,Label="noise",Interpreter="latex")
 hold off
 xlabel("$t$",Interpreter="latex");
 ylabel("Errors",Interpreter="latex");
-legend("$|f(t_i)-\hat{f}(t_i)|$",Interpreter="latex")
+legend("$|f(t_i)-\hat{f}(t_i)+mean(noise)|$",Interpreter="latex")
 
 %% Question 2.3
 
-deltaList = linspace(1e-3,1e-10);
-
+x = linspace(-10,0,101);
+deltaList = 10.^x;
+errorList = zeros(size(deltaList));
+errorMat = zeros(length(t),length(deltaList))';
+errorCoeffList = zeros(size(deltaList));
 for i = 1:length(deltaList)
+    delta = deltaList(i);
+    [cnoise,I] = Hard_threshold(delta,cnoiseInit);
+    %[cnoise,I] = Soft_threshold(delta,cnoise);
     
+    errorCoeffList(i) = mse(c,cnoise);
+    % Reconstruct the signal
+    y2 = waverec(cnoise, lnoise, 'db2');
+    % Plot the error on a logarithmic scale. Experiment with the threshold
+    % above and see what the effect is
+    %noiseMean = mean(abs(noise));
+    errorMat(i,:) = abs(y-y2+bias);
+    %err = norm(abs(y-y2+bias));
+    err = mse(y,y2+bias);
+    errorList(i) = err;
 end
+[BestErr,index] = min(errorList);
+[BestErrCoeff,indexCoeff] = min(errorCoeffList);
+bestDelta = deltaList(indexCoeff);
+
+figure
+semilogy(t, errorMat(index,:))
+hold on
+%semilogy(t, noise)
+yline(bias,Label="noise",Interpreter="latex")
+hold off
+xlabel("$t$",Interpreter="latex");
+ylabel("Errors",Interpreter="latex");
+legend("$|f(t_i)-\hat{f}(t_i)+mean(noise)|$",Interpreter="latex")
 
 function [c,I] = Hard_threshold(delta, c)
     I = find(abs(c) < delta);

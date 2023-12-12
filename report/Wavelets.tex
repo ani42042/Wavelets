@@ -143,7 +143,69 @@
 
     \subsubsection{Task 2.2}
 
+	Noise is added to the signal $\tilde{f_i} = f_i + \epsilon \mathcal{U}(0,1)$ ($\hat{f}$ is the reconstructed $\hat{f}$). We chose $\epsilon = \texttt{1e-1}$. First let us choose $\delta = 0$, the results are in \cref{fig:Delta=0}. We can see in \cref{sub:ErrCoeffD=0}, that the highest error is in the first few coefficients. Which makes sense since we are in some sense moving the mean of the function $f$ by adding a value sampled from the uniform distribution, $\rightarrow$ lower frequencies should be more effected. The total error $E = \|f-\hat{f}\|_2 = 1.805$.\\
+	
+	Now let us set $\delta = \texttt{1e-1}$ (notice it is the order of the error), the resulting figures are \cref{fig:Delta=0.1}. $E = 1.5643$, which is indeed lower then the previous one. This seems manly due to the fact that $\hat{f}$ is smoother then $\tilde{f}$, see \cref{sub:ErrorD=0.1}. \\
+	If knowledge of the mean of the noise is available, we can come put a better reconstruction of $f$ by $\hat{f}+mean(noise)$, the resulting $E = 0.1982$, see \cref{fig:Delta=0.1Better}, which has the same order as $\epsilon$.
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.49\textwidth}
+		\centering
+		%trim={<left> <lower> <right> <upper>}
+		%\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=.49\textwidth]{Images/LQG_weighted4.pdf}
+		\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=1\textwidth]{Images/CoeffDelta=0.pdf}
+		\caption{The error between the real coefficients and noisy ones}
+		\label{sub:ErrCoeffD=0}
+	\end{subfigure}
+	\begin{subfigure}{0.49\textwidth}
+		\centering
+		\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=1\textwidth]{Images/Delta=0.pdf}
+		\caption{The error between real signal and noisy one}
+		\label{sub:ErrorD=0}
+	\end{subfigure}
+	\caption{Plots for $\delta = 0$, black line is mean of noise}
+	\label{fig:Delta=0}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.49\textwidth}
+		\centering
+		%trim={<left> <lower> <right> <upper>}
+		%\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=.49\textwidth]{Images/LQG_weighted4.pdf}
+		\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=1\textwidth]{Images/CoeffDelta=0.1.pdf}
+		\caption{The error between the real coefficients and reconstructed ones}
+		\label{sub:ErrCoeffD=0.1}
+	\end{subfigure}
+	\begin{subfigure}{0.49\textwidth}
+		\centering
+		\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=1\textwidth]{Images/Delta=0.1.pdf}
+		\caption{The error between real signal and reconstructed one}
+		\label{sub:ErrorD=0.1}
+	\end{subfigure}
+	\caption{Plots for $\delta = 0.1$, black line is mean of noise}
+	\label{fig:Delta=0.1}
+\end{figure}
+
+    \begin{figure}[H]
+	\centering
+	\includegraphics[trim={3.5cm 8cm 4cm 9cm},clip,width=0.49\textwidth]{Images/Delta=0.1Better.pdf}
+	\caption{The error between real signal and reconstructed one, black line is mean of noise}
+	\label{fig:Delta=0.1Better}
+\end{figure}
+
+
     \subsubsection{Question 2.3}
+
+	Now let us try to find the best parameter $\delta$ in order to minimize the noise. This will be done by simply checking MSE between the real and filtered coefficients, for different $\delta$'s. The results are shown in \cref{fig:BestDelta}, the best delta according to MSE is $\delta = 0.501$. The reconstructed is function does have less error then the noisy one, however it is still near the order of the noise. The error is especially noticeable for $x = 0$, probably due to the fact that $f$ is not differenctiable there $|x|$. The same should be said for $x = 1$ because of the $\sign$ but it is not the case.
+
+    \begin{figure}[H]
+	\centering
+	\includegraphics[trim={3.5cm 8cm 4cm 9cm},clip,width=0.49\textwidth]{Images/DeltaOpti.pdf}
+	\caption{The error between real signal and reconstructed one, black line is mean of noise}
+	\label{fig:BestDelta}
+\end{figure}
 
     \subsection{Images with noise}
 
