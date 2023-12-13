@@ -21,7 +21,7 @@ Ablue = A(:,:,3);
 % Compress by putting small coefficients to zero.
 % Experiment with the threshold p.
 T = max([max(abs(c1)), max(abs(c2)), max(abs(c3))]);
-p = 1e-1;
+p = 1e-2;
 threshold = p*T
 I1 = find(abs(c1) < threshold);
 c1(I1) = 0;

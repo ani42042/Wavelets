@@ -229,6 +229,21 @@
 
     \subsubsection{Task 2.4}
 
+	We will test the wavelet-based denoising scheme on a picture (\cref{sub:Bib}) for different threshold (using hard thesholding), the resulting figures are in \cref{fig:Bib}, \cref{tab:bib} summarizes the results. We can clearly see as the threshold is increased, the MSE and compression ration increase as well. This is expected as a higher threshold results in more of the (signal) picture being thrown away.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|l|l|l|l|}
+	\hline
+	$\delta$	& Compression ratio & MSE & relative MSE \\ \hline
+	4.32	& 1.95 & 0.89 & \texttt{3.62e-6} \\ \hline
+	43.205	& 9.73 & 6.43 & \texttt{2.63e-5} \\ \hline
+	432.048	& 218.84 & 8.53 & \texttt{3.49e-5} \\ \hline
+	\end{tabular}
+	\caption{Table summarizing the results for different threshold values, tested on \cref{sub:Bib}}
+	\label{tab:bib}
+\end{table}
+
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}{0.49\textwidth}
