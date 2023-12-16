@@ -242,7 +242,7 @@
 		\item Hard threshold: $\delta = 0.501$ with an MSE=0.0093
 		\item Soft threshold: $\delta = 0.0398$ with an MSE=0.0097
 	\end{itemize}
-	The reconstructed functions do have less error then the noisy one. \\
+	The reconstructed functions do have visibly less error then the noisy one \cref{sub:FuncNoiseD=0}.\\
 	For hard thresholding, the error is especially noticeable for $x = 0$ (\cref{sub:BestDelta,sub:BestDeltaFunc}), probably due to the fact that $f$ is not differentiable due to $|x|$, and because of the very discontinuous nature of the thresholding this results in more error. For $x = 1$, we can also see a slight bump in error due the discontinuation of the $\sign$ function.\\
 	For soft thresholding it would seem that the error is higher over the whole domain but lower in $x=0$, due to the fact that it is less discontinuous then hard thresholding. (\cref{sub:BestDeltaSoft,sub:BestDeltaSoftFunc}) \\
 	
