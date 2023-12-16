@@ -126,12 +126,16 @@
 
     \subsubsection{Question 2.1}
 
-    Function being sampled, $N=1000$, between $[-2,2]$
+	Consider the function:
     \begin{equation*}
-        f(x) = (2+\cos{(x)}) |x| \sign{(x-1)}
-    \end{equation*}
+	f(x) = (2+\cos{(x)}) |x| \sign{(x-1)}
+	\end{equation*}
+    Function sampled in a set of $N=1000$ points in the interval $[-2,2]$
+    \begin{align*}
+    	f_j = f(x_j) && x_j = -2 + 4\frac{j-1}{N-1}, \quad j=1,\ldots,N
+    \end{align*}
     
-    Tested for wavelet transform of 4 levels deep, using the Daubechies 2 
+    We compute the wavelet transform of the vector $f = \{f_j\}_{j=1}^N$ using the Daubechies 2 wavelet of 4 levels deep 
     \begin{figure}[H]
 	\centering
 	\includegraphics[trim={3.5cm 8cm 4cm 9cm},clip,width=0.7\textwidth]{Images/Coefficents.pdf}
@@ -139,7 +143,7 @@
 	\label{fig:Coeff}
     \end{figure}
 
-    We can see in \cref{fig:Coeff}, that the size of the coefficients decreases as $i$ increases. The meaning of this is that the coefficients of small size are of less importance to the reconstruction of the signal, and can be more easily effected by added noise.
+    We can see in \cref{fig:Coeff}, that the size of the coefficients decreases as $i$ increases. The meaning of this is that the coefficients of small size are of less importance to the reconstruction of the signal, and thus removing them will disproportionally remove noise.
 
     \subsubsection{Task 2.2}
 
