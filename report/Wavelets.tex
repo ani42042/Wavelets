@@ -149,11 +149,20 @@
 
 	Noise is added to the signal $\tilde{f_i} = f_i + \epsilon \mathcal{U}(0,1)$ ($\hat{f}$ is the reconstructed $\tilde{f}$). We chose $\epsilon = \texttt{1e-1}$. First let us choose $\delta = 0$, the results are in \cref{fig:Delta=0}. We can see in \cref{sub:ErrCoeffD=0}, that the highest error is in the first few coefficients. Which makes sense since we are in some sense moving the mean of the function $f$ by adding a value sampled from the uniform distribution, $\rightarrow$ lower frequencies should be more effected. The total error $E = \|f-\hat{f}\|_2 = 1.805$.\\
 	
-	Now let us set $\delta = \texttt{1e-1}$ (notice it is the order of the error), the resulting figures are \cref{fig:Delta=0.1}. $E = 1.5643$, which is indeed lower then the previous one. This seems manly due to the fact that $\hat{f}$ is smoother then $\tilde{f}$, see \cref{sub:ErrorD=0.1}. \\
-	If knowledge of the mean of the noise is available, we can come put a better reconstruction of $f$ by $\hat{f}+mean(noise)$, the resulting $E = 0.1982$, see \cref{sub:Delta=0.1Better}, which has the same order as $\epsilon$.
+	Now let us set $\delta = \texttt{1e-1}$, the resulting figures are \cref{fig:Delta=0.1}. 3.35\% of the wavelet coefficients were set to 0, for both types of thresholding. \\
+	$E = 1.5643$, which is indeed lower then the previous one. This seems manly due to the fact that $\hat{f}$ is smoother then $\tilde{f}$, see \cref{sub:ErrorD=0.1}. \\
+	If knowledge of the mean of the noise is available, we can come put a better reconstruction of $f$ by $\hat{f}-mean(noise)$, in fact this is what will be done for the rest of the subsection, the resulting $E = 0.1982$, see \cref{sub:Delta=0.1Better}. In \cref{sub:Delta=0.1BetterSoft}, we can see the error when using soft thresholding, $E = 0.61$.
 
 \begin{figure}[H]
 	\centering
+	\begin{subfigure}{0.49\textwidth}
+	\centering
+	%trim={<left> <lower> <right> <upper>}
+	%\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=.49\textwidth]{Images/LQG_weighted4.pdf}
+	\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=1\textwidth]{Images/FuncNoise.pdf}
+	\caption{Plot of function, and it's noisy counterpart}
+	\label{sub:FuncNoiseD=0}
+\end{subfigure}
 	\begin{subfigure}{0.49\textwidth}
 		\centering
 		%trim={<left> <lower> <right> <upper>}
@@ -206,6 +215,7 @@
 \caption{The error between real signal and reconstructed one, black line is mean of noise. For soft thresholding}
 \label{sub:Delta=0.1BetterSoft}
 \end{subfigure}
+\caption{}
 \end{figure}
 
 

@@ -9,8 +9,7 @@ y = abs(t) .*(2+cos(t)) .* sign(t);
 
 % Compute its wavelet transform, four levels deep, using the Daubechies 2
 % wavelet.
-N = 5;
-[c,l] = wavedec(y, N, 'db2');
+[c,l] = wavedec(y, 5, 'db2');
 
 % Visualize the coefficients on a logarithmic scale.
 % Try to explain what you see! Experiment with other wavelets and, again,
@@ -27,7 +26,7 @@ rng(42)
 epsilon = 1e-1;
 noise = epsilon*rand(size(y));
 ynoise = y + noise;
-[cnoise,lnoise] = wavedec(ynoise, N, 'db2');
+[cnoise,lnoise] = wavedec(ynoise, 5, 'db2');
 
 figure
 plot(t,y)
@@ -45,15 +44,15 @@ delta = 1e-1;
 
 % change here what thresholding method wanted
 cnoiseInit = cnoise;
-%[cnoise,I] = Hard_threshold(delta,cnoise);
-[cnoise,I] = Soft_threshold(delta,cnoise);
+[cnoise,I] = Hard_threshold(delta,cnoise);
+%[cnoise,I] = Soft_threshold(delta,cnoise);
 
 % How many coefficients did we put to zero:
 length(I)
 % out of a total of
 length(cnoise)
-% ratio
-length(I)/length(cnoise)
+% ratio put to 0
+(1-length(I)/length(cnoise))*100
 errCoeff = abs(c-cnoise);
 
 % coefficent error between real and thresholded noisy
