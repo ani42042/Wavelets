@@ -122,7 +122,7 @@
 
     \section{Wavelet-based denoising}
  
-	\subsection{A univariate functions with noise}
+	\subsection{A univariate functions with noise} \label{subsec:UniVariate}
 
     \subsubsection{Question 2.1}
 
@@ -135,7 +135,7 @@
     	f_j = f(x_j) && x_j = -2 + 4\frac{j-1}{N-1}, \quad j=1,\ldots,N
     \end{align*}
     
-    We compute the wavelet transform of the vector $f = \{f_j\}_{j=1}^N$ using the Daubechies 2 wavelet of 4 levels deep. boundary conditions used is: Symmetrization (half-point). 
+    We compute the wavelet transform of the vector $f = \{f_j\}_{j=1}^N$ using the Daubechies 2 wavelet of 4 levels deep. boundary conditions used is: Symmetrization (half-point). These same parameters are used for the rest of \cref{subsec:UniVariate}.
     \begin{figure}[H]
 	\centering
 	\includegraphics[trim={3.5cm 8cm 4cm 9cm},clip,width=0.7\textwidth]{Images/Coefficents.pdf}
@@ -162,12 +162,12 @@
 			\sign{(x)} (|x|-\delta), \quad |x| \ge 0
 	\end{cases}
 	\end{equation*}
-	Are going to be tested. \\
+	are going to be tested. $x$ are the wavelet coefficients.\\
 	First let us choose $\delta = 0$, the results are in \cref{fig:Delta=0}. We can see in \cref{sub:ErrCoeffD=0}, that the highest error is in the first few coefficients. Which makes sense since we are in some sense moving the mean of the function $f$ by adding a value sampled from the uniform distribution, $\rightarrow$ lower frequencies should be more effected. The total error $E = \|f-\hat{f}\|_2 = 1.805$.\\
 	
 	Now let us set $\delta = \texttt{1e-1}$, the resulting figures are \cref{fig:Delta=0.1}. 3.35\% of the wavelet coefficients were set to 0, for both types of thresholding. \\
-	$E = 1.5643$, which is indeed lower then the previous one. This seems manly due to the fact that $\hat{f}$ is smoother then $\tilde{f}$, see \cref{sub:ErrorD=0.1}. \\
-	If knowledge of the mean of the noise is available, we can come put a better reconstruction of $f$ by $\hat{f}-mean(noise)$, in fact this is what will be done for the rest of the subsection, the resulting $E = 0.1982$, see \cref{sub:Delta=0.1Better}. In \cref{sub:Delta=0.1BetterSoft}, we can see the error when using soft thresholding, $E = 0.61$.
+	For hard thresholding, $E = 1.5643$, which is indeed lower then the previous one. This seems manly due to the fact that $\hat{f}$ is smoother then $\tilde{f}$, see \cref{sub:ErrorD=0.1}. \\
+	If knowledge of the mean of the noise is available, we can come put a better reconstruction of $f$ by $\hat{f}-mean(noise)$, in fact this is what will be done for the rest of \cref{subsec:UniVariate}, the resulting $E = 0.1982$, see \cref{sub:Delta=0.1Better}. In \cref{sub:Delta=0.1BetterSoft}, we can see the error when using soft thresholding, $E = 0.61$.
 
 \begin{figure}[H]
 	\centering
@@ -237,10 +237,10 @@
 
     \subsubsection{Question 2.3}
 
-	Now let us try to find the best parameter $\delta$ in order to minimize the noise. This will be done by simply checking MSE between the real and filtered coefficients $\sum_{i} (x_i - \hat{x}_i)^2$, for 101 different $\delta$'s in $[\texttt{1e-10},\texttt{1e0}]$. The results are shown in \cref{fig:OptiDelta}, the best delta according to MSE is 
+	Now let us try to find the best parameter $\delta$ in order to minimize the noise. This will be done by simply checking MSE between the real and filtered coefficients $\sum_{i} (x_i - \hat{x}_i)^2$, for 101 different equidistant $\delta$'s in $[\texttt{1e-10},\texttt{1e0}]$. The results are shown in \cref{fig:OptiDelta}, the best delta according to MSE is 
 	\begin{itemize}
-		\item Hard threshold: $\delta = 0.501$ with an MSE=0.0093
-		\item Soft threshold: $\delta = 0.0398$ with an MSE=0.0097
+		\item Hard threshold: $\delta = 0.501$ with an MSE=0.0026
+		\item Soft threshold: $\delta = 0.0398$ with an MSE=0.0028
 	\end{itemize}
 	The reconstructed functions do have visibly less error then the noisy one \cref{sub:FuncNoiseD=0}.\\
 	For hard thresholding, the error is especially noticeable for $x = 0$ (\cref{sub:BestDelta,sub:BestDeltaFunc}), probably due to the fact that $f$ is not differentiable due to $|x|$, and because of the very discontinuous nature of the thresholding this results in more error. For $x = 1$, we can also see a slight bump in error due the discontinuation of the $\sign$ function.\\
@@ -252,7 +252,7 @@
 	\begin{subfigure}{0.49\textwidth}
 	\centering
 \includegraphics[trim={3.5cm 8cm 4cm 9cm},clip,width=1\textwidth]{Images/DeltaOpti.pdf}
-\caption{The error between real signal and reconstructed one, black line is mean of noise. $\delta = 0.501$.For Hard thresholding}
+\caption{The error between real signal and reconstructed one, black line is mean of noise. $\delta = 0.501$. For Hard thresholding}
 \label{sub:BestDelta}
 \end{subfigure}
 \begin{subfigure}{0.49\textwidth}
@@ -280,8 +280,17 @@
     \subsection{Images with noise}
 
     \subsubsection{Task 2.4}
+	An image is composed of 3 different matrices, each representing the value of the color red,blue and green. To denoise an image, the following steps will be executed:
+	\begin{enumerate}
+		\item Separate image (tensor) into 3 matrices representing the 3 RGB colors
+		\item Compute the 2D wavelet transform for each of the 3 matrices
+		\item Apply a thresholding scheme to the wavelet coefficients, for the 3 different colors
+		\item Compute the inverse 2D wavelet transform, for the 3 different colors
+		\item Recombine the denoised color matrices into 1 image (tensor)
+	\end{enumerate}
+	Since we are dealing with image denoising, the wavelet families to test on are Daubechies or biorthogonal CDF's. \\
 
-	We will test the wavelet-based denoising scheme on a picture (\cref{sub:Bib}) for different threshold (using hard thesholding), the resulting figures are in \cref{fig:Bib}, \cref{tab:bib} summarizes the results. We can clearly see as the threshold is increased, the MSE and compression ration increase as well. This is expected as a higher threshold results in more of the (signal) picture being thrown away.
+	We will test the wavelet-based denoising scheme on a picture (\cref{sub:Bib}) for different thresholds (using hard thesholding), BiorSplines4.4 as wavelet and decomposition level of 4. The resulting figures are in \cref{fig:Bib}, \cref{tab:bib} summarizes the results. We can clearly see as the threshold is increased, the MSE and compression ration increase as well. This is expected as a higher threshold results in more of the (signal) picture being thrown away.
 
 \begin{table}[H]
 	\centering
@@ -290,9 +299,9 @@
 	$\delta$	& Compression ratio & MSE & relative MSE \\ \hline
 	4.32	& 1.95 & 0.89 & \texttt{3.62e-6} \\ \hline
 	43.205	& 9.73 & 6.43 & \texttt{2.63e-5} \\ \hline
-	432.048	& 218.84 & 8.53 & \texttt{3.49e-5} \\ \hline
+	432.048	& 219.84 & 8.53 & \texttt{3.49e-5} \\ \hline
 	\end{tabular}
-	\caption{Table summarizing the results for different threshold values, tested on \cref{sub:Bib}}
+	\caption{Table summarizing the results for different threshold values, tested on \cref{sub:Bib}. Using BiorSplines4.4 as wavelet and decomposition level of 4}
 	\label{tab:bib}
 \end{table}
 
@@ -330,11 +339,20 @@
 	\caption{Picture of a library, $\delta = 432.048$}
 	\label{sub:BibBad}
 \end{subfigure}
-	\caption{Picture of a library (taken from personal phone), for different values of hard threshold}
+	\caption{Picture of a library (taken from personal phone), for different values of hard threshold. Using BiorSplines4.4 as wavelet and decomposition level of 4}
 	\label{fig:Bib}
 \end{figure}
 
     \subsubsection{Question 2.5}
+
+	We will now add zero-mean, Gaussian white noise with variance of 0.01 to \cref{sub:Bib} via matlab \texttt{imnoise(I,'gaussian')} function. The noisy image looks like \cref{fig:Noisy}, clearly noisy.
+    \begin{figure}[H]
+	\centering
+	\includegraphics[trim={0cm 6cm 0cm 5.5cm},clip,width=0.7\textwidth]{Images/NoisyBib.pdf}
+	\caption{\cref{sub:Bib} with added zero-mean, Gaussian white noise with variance of 0.01. Added via matlab \texttt{imnoise(I,'gaussian')}}
+	\label{fig:Noisy}
+\end{figure}
+
 
     \subsection{Using a redundant wavelet transform}
 

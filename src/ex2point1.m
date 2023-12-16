@@ -108,7 +108,7 @@ end
 [BestErr,index] = min(errorList);
 [BestErrCoeff,indexCoeff] = min(errorCoeffList);
 bestDelta = deltaList(indexCoeff)
-errorList(indexCoeff)
+BestErrCoeff
 
 figure
 semilogy(t, errorMat(indexCoeff,:))
@@ -127,7 +127,7 @@ plot(t,F(indexCoeff,:))
 hold off
 xlabel("$t$",Interpreter="latex");
 ylabel("function",Interpreter="latex");
-legend("$f(t)$","$\hat{f}(t)$",Interpreter="latex")
+legend("$f(t)$","$\hat{f}(t)-mean(noise)$",Interpreter="latex")
 
 function [c,I] = Hard_threshold(delta, c)
     I = find(abs(c) < delta);
