@@ -9,7 +9,8 @@ y = abs(t) .*(2+cos(t)) .* sign(t);
 
 % Compute its wavelet transform, four levels deep, using the Daubechies 2
 % wavelet.
-[c,l] = wavedec(y, 5, 'db2');
+N = 5;
+[c,l] = wavedec(y, N, 'db2');
 
 % Visualize the coefficients on a logarithmic scale.
 % Try to explain what you see! Experiment with other wavelets and, again,
@@ -26,7 +27,7 @@ rng(42)
 epsilon = 1e-1;
 noise = epsilon*rand(size(y));
 ynoise = y + noise;
-[cnoise,lnoise] = wavedec(ynoise, 5, 'db2');
+[cnoise,lnoise] = wavedec(ynoise, N, 'db2');
 
 figure
 plot(t,y)
