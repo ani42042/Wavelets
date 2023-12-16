@@ -86,11 +86,12 @@ x = linspace(-10,0,101);
 deltaList = 10.^x;
 errorList = zeros(size(deltaList));
 errorMat = zeros(length(t),length(deltaList))';
+F = zeros(length(t),length(deltaList))';
 errorCoeffList = zeros(size(deltaList));
 for i = 1:length(deltaList)
     delta = deltaList(i);
     %[cnoise,I] = Hard_threshold(delta,cnoiseInit);
-    [cnoise,I] = Soft_threshold(delta,cnoise);
+    [cnoise,I] = Soft_threshold(delta,cnoiseInit);
     
     errorCoeffList(i) = mse(c,cnoise);
     % Reconstruct the signal
@@ -98,6 +99,7 @@ for i = 1:length(deltaList)
     % Plot the error on a logarithmic scale. Experiment with the threshold
     % above and see what the effect is
     %noiseMean = mean(abs(noise));
+    F(i,:) = y2-bias;
     errorMat(i,:) = abs(y-y2+bias);
     %err = norm(abs(y-y2+bias));
     err = mse(y,y2+bias);
@@ -105,10 +107,11 @@ for i = 1:length(deltaList)
 end
 [BestErr,index] = min(errorList);
 [BestErrCoeff,indexCoeff] = min(errorCoeffList);
-bestDelta = deltaList(indexCoeff);
+bestDelta = deltaList(indexCoeff)
+errorList(indexCoeff)
 
 figure
-semilogy(t, errorMat(index,:))
+semilogy(t, errorMat(indexCoeff,:))
 hold on
 %semilogy(t, noise)
 yline(bias,Label="noise",Interpreter="latex")
@@ -116,6 +119,15 @@ hold off
 xlabel("$t$",Interpreter="latex");
 ylabel("Errors",Interpreter="latex");
 legend("$|f(t_i)-\hat{f}(t_i)+mean(noise)|$",Interpreter="latex")
+
+figure
+plot(t,y)
+hold on
+plot(t,F(indexCoeff,:))
+hold off
+xlabel("$t$",Interpreter="latex");
+ylabel("function",Interpreter="latex");
+legend("$f(t)$","$\hat{f}(t)$",Interpreter="latex")
 
 function [c,I] = Hard_threshold(delta, c)
     I = find(abs(c) < delta);
