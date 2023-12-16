@@ -147,7 +147,23 @@
 
     \subsubsection{Task 2.2}
 
-	Noise is added to the signal $\tilde{f_i} = f_i + \epsilon \mathcal{U}(0,1)$ ($\hat{f}$ is the reconstructed $\tilde{f}$). We chose $\epsilon = \texttt{1e-1}$. First let us choose $\delta = 0$, the results are in \cref{fig:Delta=0}. We can see in \cref{sub:ErrCoeffD=0}, that the highest error is in the first few coefficients. Which makes sense since we are in some sense moving the mean of the function $f$ by adding a value sampled from the uniform distribution, $\rightarrow$ lower frequencies should be more effected. The total error $E = \|f-\hat{f}\|_2 = 1.805$.\\
+	Noise is added to the signal $\tilde{f_i} = f_i + \epsilon \mathcal{U}(0,1)$ ($\hat{f}$ is the reconstructed $\tilde{f}$). We chose $\epsilon = \texttt{1e-1}$. \\
+	Both hard thresholding:
+	\begin{equation*}
+			t_\delta = \begin{cases}
+				0, \quad |x| < \delta\\
+				x, \quad |x| \ge 0
+		\end{cases}
+	\end{equation*}
+	And soft thresholding
+	\begin{equation*}
+			t_\delta = \begin{cases}
+			0, \quad |x| < \delta\\
+			\sign{(x)} (|x|-\delta), \quad |x| \ge 0
+	\end{cases}
+	\end{equation*}
+	Are going to be tested. \\
+	First let us choose $\delta = 0$, the results are in \cref{fig:Delta=0}. We can see in \cref{sub:ErrCoeffD=0}, that the highest error is in the first few coefficients. Which makes sense since we are in some sense moving the mean of the function $f$ by adding a value sampled from the uniform distribution, $\rightarrow$ lower frequencies should be more effected. The total error $E = \|f-\hat{f}\|_2 = 1.805$.\\
 	
 	Now let us set $\delta = \texttt{1e-1}$, the resulting figures are \cref{fig:Delta=0.1}. 3.35\% of the wavelet coefficients were set to 0, for both types of thresholding. \\
 	$E = 1.5643$, which is indeed lower then the previous one. This seems manly due to the fact that $\hat{f}$ is smoother then $\tilde{f}$, see \cref{sub:ErrorD=0.1}. \\
