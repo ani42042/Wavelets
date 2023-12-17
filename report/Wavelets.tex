@@ -345,7 +345,11 @@
 
     \subsubsection{Question 2.5}
 
-	We will now add zero-mean, Gaussian white noise with variance of 0.01 to \cref{sub:Bib} via matlab \texttt{imnoise(I,'gaussian')} function. The noisy image looks like \cref{fig:Noisy}, clearly noisy.
+	We will now add zero-mean, Gaussian white noise with variance of 0.01 to \cref{sub:Bib} via matlab \texttt{imnoise(I,'gaussian')} function. The noisy image looks like \cref{fig:Noisy}, it has an MSE of 9.22 and clearly looks noisy. The MSE was computed via
+	\begin{equation*}
+		\texttt{MSE} = \frac{\sqrt{\sum_{i} \sum_{j} \sum_{k} (\tilde{A}_{ijk} - A_{ijk})^2}}{M}
+	\end{equation*}
+	With $A$ the tensor representing the image, $M$ the number of entries in $A$, $\tilde{A}$ the image with added noise.
     \begin{figure}[H]
 	\centering
 	\includegraphics[trim={0cm 6cm 0cm 5.5cm},clip,width=0.7\textwidth]{Images/NoisyBib.pdf}
@@ -353,7 +357,24 @@
 	\label{fig:Noisy}
 \end{figure}
 
-
+	We will test the denosing procedure for both hard and soft thresholding, for a range of $\delta = p T$'s, with $T$ the max of the wavelet coefficients of the 3 RGB colors and $p \in [0,1]$. 100 equidistant $p$'s were tested, obtained from matlab \texttt{linspace(0,1,100)}. \\
+	The tested wavelets range from 
+	\begin{itemize}
+		\item Daubechies (orthogonal): \texttt{"db1",...,"db45"}
+		\item BiorSplines (biorthgonal): \texttt{"bior1.1", "bior1.3", "bior1.5"
+			"bior2.2", "bior2.4", "bior2.6", "bior2.8"
+			"bior3.1", "bior3.3", "bior3.5", "bior3.7"
+			"bior3.9", "bior4.4", "bior5.5", "bior6.8"}
+		\item ReverseBior (biorthogonal): \texttt{	"rbio1.1", "rbio1.3", "rbio1.5"
+			"rbio2.2", "rbio2.4", "rbio2.6", "rbio2.8"
+			"rbio3.1", "rbio3.3", "rbio3.5", "rbio3.7"
+			"rbio3.9", "rbio4.4", "rbio5.5", "rbio6.8"}
+	\end{itemize}
+	
+	The best parameters will be determined using the MSE metric, of course in practice the clean image is usually not available, so the "eyeball" norm would have to be use.
+	
+	As we can see the best parameters seem to be INSERT OPTI PARAM. However the parameters are not generalizable since these are the best parameters for this denoising this specific image with gaussian noise, for different type of noise and image the optimal parameters might be different.
+	
     \subsection{Using a redundant wavelet transform}
 
     \subsubsection{Task 2.6}
