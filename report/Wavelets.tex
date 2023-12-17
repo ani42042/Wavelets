@@ -143,7 +143,7 @@
 	\label{fig:Coeff}
     \end{figure}
 
-    We can see in \cref{fig:Coeff}, that the size of the coefficients decreases as $i$ increases. The meaning of this is that the coefficients of small size are of less importance to the reconstruction of the signal, and thus removing them will disproportionally remove noise.
+    We can see in \footnote{To recreate \cref{fig:Coeff,fig:Delta=0,fig:Delta=0.1,fig:HardSoft,fig:OptiDelta} run \texttt{ex2point1.m}} \cref{fig:Coeff}, that the size of the coefficients decreases as $i$ increases. The meaning of this is that the coefficients of small size are of less importance to the reconstruction of the signal, and thus removing them will disproportionally remove noise.
 
     \subsubsection{Task 2.2}
 
@@ -232,6 +232,7 @@
 \label{sub:Delta=0.1BetterSoft}
 \end{subfigure}
 \caption{}
+\label{fig:HardSoft}
 \end{figure}
 
 
@@ -290,18 +291,18 @@
 	\end{enumerate}
 	Since we are dealing with image denoising, the wavelet families to test on are Daubechies or biorthogonal CDF's. \\
 
-	We will test the wavelet-based denoising scheme on a picture (\cref{sub:Bib}) for different thresholds (using hard thesholding), BiorSplines4.4 as wavelet and decomposition level of 4. The resulting figures are in \cref{fig:Bib}, \cref{tab:bib} summarizes the results. We can clearly see as the threshold is increased, the MSE and compression ration increase as well. This is expected as a higher threshold results in more of the (signal) picture being thrown away.
+	We will test the wavelet-based denoising scheme on a picture (\cref{sub:Bib}) for different thresholds (using hard thesholding), BiorSplines4.4 as wavelet and decomposition level of 4. The resulting figures are in \cref{fig:Bib}, \cref{tab:bib} summarizes the results. We can clearly see as the threshold is increased, the error (Frobenius) and compression ration increase as well. This is expected as a higher threshold results in more of the (signal) picture being thrown away.
 
 \begin{table}[H]
 	\centering
 	\begin{tabular}{|l|l|l|l|}
 	\hline
-	$\delta$	& Compression ratio & MSE & relative MSE \\ \hline
-	4.32	& 1.95 & 0.89 & \texttt{3.62e-6} \\ \hline
-	43.205	& 9.73 & 6.43 & \texttt{2.63e-5} \\ \hline
-	432.048	& 219.84 & 8.53 & \texttt{3.49e-5} \\ \hline
+	$\delta$	& Compression ratio & $\|A-\tilde{A}\|_F$ & $\frac{\|A-\hat{A}\|_F}{\|A\|_F}$ \\ \hline
+	4.32	& 1.95 & \texttt{2.37e+03} & \texttt{0.0097} \\ \hline
+	43.205	& 9.73 & \texttt{2.38e+04} & \texttt{0.097} \\ \hline
+	432.048	& 219.84 & \texttt{6.805e+04} & \texttt{0.28} \\ \hline
 	\end{tabular}
-	\caption{Table summarizing the results for different threshold values, tested on \cref{sub:Bib}. Using BiorSplines4.4 as wavelet and decomposition level of 4}
+	\caption{Table summarizing the results for different threshold values, tested on \cref{sub:Bib}. Using BiorSplines4.4 as wavelet and decomposition level of 4. $\hat{A}$ is the reconstructed image}
 	\label{tab:bib}
 \end{table}
 
@@ -345,11 +346,11 @@
 
     \subsubsection{Question 2.5}
 
-	We will now add zero-mean, Gaussian white noise with variance of 0.01 to \cref{sub:Bib} via matlab \texttt{imnoise(I,'gaussian')} function. The noisy image looks like \cref{fig:Noisy}, it has an MSE of 9.22 and clearly looks noisy. The MSE was computed via
-	\begin{equation*}
-		\texttt{MSE} = \frac{\sqrt{\sum_{i} \sum_{j} \sum_{k} (\tilde{A}_{ijk} - A_{ijk})^2}}{M}
-	\end{equation*}
-	With $A$ the tensor representing the image, $M$ the number of entries in $A$, $\tilde{A}$ the image with added noise.
+	We will now add zero-mean, Gaussian white noise with variance of 0.01 to \cref{sub:Bib} via matlab \texttt{imnoise(I,'gaussian')} function. The noisy image looks like \cref{fig:Noisy}, it has an SNR (signal to noise ratio) of 7.41 and clearly looks noisy. The SNR was computed via
+	\begin{equation}
+		\texttt{SNR} = 10 \log_{10}{\frac{\|\hat{A}\|_F}{\|\hat{A}-A\|_F}}
+	\end{equation}
+	With $A$ the tensor representing the image, $\hat{A}$ the reconstructed image, in the above case $\hat{A}$ is the noisy image.
     \begin{figure}[H]
 	\centering
 	\includegraphics[trim={0cm 6cm 0cm 5.5cm},clip,width=0.7\textwidth]{Images/NoisyBib.pdf}
@@ -358,7 +359,7 @@
 \end{figure}
 
 	We will test the denosing procedure for both hard and soft thresholding, for a range of $\delta = p T$'s, with $T$ the max of the wavelet coefficients of the 3 RGB colors and $p \in [0,1]$. 100 equidistant $p$'s were tested, obtained from matlab \texttt{linspace(0,1,100)}. \\
-	The tested wavelets range from 
+	The tested wavelets range from (For 4 level deep)
 	\begin{itemize}
 		\item Daubechies (orthogonal): \texttt{"db1",...,"db45"}
 		\item BiorSplines (biorthgonal): \texttt{"bior1.1", "bior1.3", "bior1.5"
@@ -370,10 +371,45 @@
 			"rbio3.1", "rbio3.3", "rbio3.5", "rbio3.7"
 			"rbio3.9", "rbio4.4", "rbio5.5", "rbio6.8"}
 	\end{itemize}
+	1500 different combinations were tested, only the best will be shown (for obvious reasons) \footnote{To run the tests and recreate \cref{fig:Bib,fig:Noisy,fig:RecBib,fig:CusBib}, run \texttt{ex2point2.m}} \\
 	
-	The best parameters will be determined using the MSE metric, of course in practice the clean image is usually not available, so the "eyeball" norm would have to be use.
+	The best parameters will be determined using the SNR metric (the higher the better), of course in practice the clean image is usually not available, so the "eyeball" norm would have to be use. The best parameters according to \texttt{SNR} are: \texttt{rbio2.4} for the wavelet, threshold of 3.89 and a $\texttt{SNR} = \texttt{15.36}$, using hard thresholding. See \cref{fig:RecBib} for the resulting recontructed image. It looks a little more whitened, but otherwise looks the same as the noisy figure. The results are pretty underwhelming.
+
+    \begin{figure}[H]
+	\centering
+	\includegraphics[trim={0cm 6cm 0cm 5.5cm},clip,width=0.7\textwidth]{Images/RecontructedBib.pdf}
+	\caption{Recontructed image from \cref{fig:Noisy}. Using threshold of 3.89, hard thresholding and \texttt{rbio2.4} for the wavelet}
+	\label{fig:RecBib}
+\end{figure}
 	
-	As we can see the best parameters seem to be INSERT OPTI PARAM. However the parameters are not generalizable since these are the best parameters for this denoising this specific image with gaussian noise, for different type of noise and image the optimal parameters might be different.
+	By trial and error, we get the following parameters: threshold of 41.71, \texttt{db30} as wavelet and \texttt{SNR = 6.7} using soft thresholding. As we can see in \cref{fig:CusBib}, the image feels less noisy but more blurry.
+	
+    \begin{figure}[H]
+	\centering
+	\includegraphics[trim={0cm 6cm 0cm 5.5cm},clip,width=0.7\textwidth]{Images/CustomBib.pdf}
+	\caption{Recontructed image from \cref{fig:Noisy}. Using threshold of 41.71, soft thresholding and \texttt{db30} for the wavelet}
+	\label{fig:CusBib}
+	
+	The better image is a matter of preference.
+	
+\end{figure}
+	
+	\begin{comment}
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|}
+		\hline
+		$p$	& 0.001 &   0.11 &   0.22  &  0.33 &   0.44 &   0.56  &  0.68 &   0.78  &  0.89   & 1 \\ \hline
+		\texttt{db1} & & & & & & & & & & \\ \hline
+	\end{tabular}
+	\caption{Table summarizing the SNR results for different threshold values, tested on \cref{sub:Bib}. Using BiorSplines4.4 as wavelet and decomposition level of 4}
+	\label{tab:ImageNoise}
+\end{table}
+	\end{comment}
+	
+	
+	
+	%However the parameters are not generalizable since these are the best parameters for this denoising this specific image with gaussian noise, for different type of noise and image the optimal parameters might be different.
 	
     \subsection{Using a redundant wavelet transform}
 

@@ -6,7 +6,7 @@ figure
 imshow(A)
 
 %% compress image
-p = 1e-2; thresholdType = 'Hard'; waveletType = 'bior4.4';
+p = 1e-3; thresholdType = 'Hard'; waveletType = 'bior4.4';
 A_noise = A;
 [A2,mserr,mserr_rel,compression_ratio,threshold,SNR] = denoising_image(A_noise,p,thresholdType,waveletType,A);
 
@@ -22,14 +22,15 @@ rng(42)
 %A_noise = imnoise(A,'salt & pepper');
 %A_noise = imnoise(A,'speckle');
 A_noise = imnoise(A,"gaussian");
-
-msNoise = sqrt(sum(sum(sum( (A_noise-A).^2 ))) / length(A(:)));
+SNR = 10*log10(norm(double(A_noise),'fro')/(norm(double(A_noise)-double(A),'fro')));
+%msNoise = sqrt(sum(sum(sum( (A_noise-A).^2 ))) / length(A(:)));
+msNoise = norm(double(A_noise)-double(A),'fro');
 % Plot the noisy image
 figure
 imshow(A_noise)
 
 %% Denoise image
-p = 5e-3; thresholdType = 'Hard'; waveletType = 'db6';%'bior4.4'; 
+p = 9e-3; thresholdType = 'Soft'; waveletType = 'db30'; 
 [A2,mserr,mserr_rel,compression_ratio,threshold,SNR] = denoising_image(A_noise,p,thresholdType,waveletType,A);
 
 % Plot the result after denosing/compression
@@ -52,36 +53,50 @@ end
 % the parameters to be tested
 wavelets = [wavelets, tempStrings];
 thesholding = ["Hard","Soft"];
-p = linspace(0,1,100);
+p = linspace(1e-3,1,10);
 
 % parameters to store results
-mserrMat = zeros(length(thesholding),length(wavelets),length(p));
+SNRMat = zeros(length(thesholding),length(wavelets),length(p));
 ThreshMat = zeros(length(thesholding),length(wavelets),length(p));
-mprev = +inf;
-BestImage = A_noise;
+% mprev = +inf;
+% BestImage = A_noise;
 for i = 1:length(thesholding)
-    thesholdType = threshold(i);
+    thesholdType = thesholding(i);
     progressbar
     for j = 1:length(wavelets)
         wave = wavelets(j);
         for k = 1:length(p)
             delta = p(k);
-            [A2,mserr,~,~,threshold,~] = denoising_image(A_noise,delta,thresholdType,wave,A);
-            mserrMat(i,j,k) = mserr;
+            [~,~,~,~,threshold,SNR] = denoising_image(A_noise,delta,thresholdType,wave,A);
+            SNRMat(i,j,k) = SNR;
             ThreshMat(i,j,k) = threshold;
-            if (mprev > mserr)
-                BestImage = A2;
-            end
-            mprev = mserr;
+            % if (mprev > mserr)
+            %     BestImage = A2;
+            % end
+            % mprev = mserr;
         end
         progressbar(j/length(wavelets));
     end
 end
-
+save Data.mat ThreshMat SNRMat
 %% plot best image
+%load Data.mat
 
-[BestErr,I] = max(mserrMat,[],'all');
-BestThresh = ThreshMat(I);
+ibest = 1;
+jbest = 1;
+kbest = 1;
+bestSNR = SNRMat(ibest,jbest,kbest)
+for i = 1:size(SNRMat,1)
+    for j=1:size(SNRMat,2)
+        for k=1:size(SNRMat,3)
+            if (bestSNR < SNRMat(i,j,k))
+                bestSNR = SNRMat(i,j,k); ibest = i; jbest = j; kbest = k;
+            end
+        end
+    end
+end
+BestThresh = ThreshMat(ibest,jbest,kbest);
+[BestImage,~,~,~,~,SNR] = denoising_image(A_noise,p(kbest),thesholding(ibest),wavelets(jbest),A);
 % Plot the result after denosing for best params
 figure
 imshow(BestImage)
@@ -128,7 +143,7 @@ function [A2,mserr,mserr_rel,compression_ratio,threshold,SNR] = denoising_image(
     %c2(I2) = 0;
     %I3 = find(abs(c3) < threshold);
     %c3(I3) = 0;
-    if (strcmp('Hard',threshtype))
+    if (strcmp("Hard",threshtype))
         [c1,I1] = Hard_threshold(threshold, c1);
         [c2,I2] = Hard_threshold(threshold, c2);
         [c3,I3] = Hard_threshold(threshold, c3);
@@ -163,7 +178,8 @@ function [A2,mserr,mserr_rel,compression_ratio,threshold,SNR] = denoising_image(
     compression_ratio = N / (N-M);
     
     % Root mean square error
-    mserr = sqrt(sum(sum(sum( (A2-A_correct).^2 ))) / length(A_correct(:)));
+    %mserr = sqrt(sum(sum(sum( (A2-A_correct).^2 ))) / length(A_correct(:)));
+    mserr = norm(double(A2)-double(A_correct),'fro');
     % the norm of A(:) is equal to the so-called Frobenius norm
     mserr_rel = mserr / norm(double(A_correct), "fro");
 
