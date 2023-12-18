@@ -21,9 +21,10 @@ function [B1,B2,B3,threshold] = denoise_tensor(A1,A2,A3,wavelet,p,type,threshold
             [c3,~] = Soft_threshold(threshold,c3);
         end
         c1 = reshape(c1,sz2); c2 = reshape(c2,sz2); c3 = reshape(c3,sz2);
-        B1 = iswt2(c1,l1,a1,b1, wavelet);
-        B2 = iswt2(c2,l2,a2,b2, wavelet);
-        B3 = iswt2(c3,l3,a3,b3, wavelet);
+        zerodetails = zeros(size(c1));
+        B1 = iswt2(c1,zerodetails,zerodetails,zerodetails, wavelet);
+        B2 = iswt2(c2,zerodetails,zerodetails,zerodetails, wavelet);
+        B3 = iswt2(c3,zerodetails,zerodetails,zerodetails, wavelet);
     else
         [c1,l1] = wavedec2(A1, Level, wavelet);
         [c2,l2] = wavedec2(A2, Level, wavelet);

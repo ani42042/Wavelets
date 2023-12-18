@@ -19,8 +19,12 @@ for w = 1:length(wavelets)
     Ared_orig= Ared;
     
     % Preprocessing 
-    col_start = 651;col_end=661;
-    row_start = 443; row_end=453;
+    % col_start = 1300;col_end=1310;
+    % row_start = 50; row_end=60;
+    col_start = 649+16;col_end=659+24;
+    row_start = 441+100; row_end=451+102;
+    % col_start = 550;col_end=659+150;
+    % row_start = 441+100-6; row_end=451+102+5;
     height = row_end-row_start+2;
     mask = zeros(size(Ared));
     mask(row_start:row_end,col_start:col_end) = 1; % SOFTCODED AS FUCK
