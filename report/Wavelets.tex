@@ -56,7 +56,9 @@
 \usepackage{cleveref}
 \usepackage[bottom]{footmisc}
 \usepackage{comment}
+\usepackage{longtable}
 
+\usepackage{lipsum} % just for dummy text- not needed for a longtable
 \fancyhead[C]{}
 \fancyhead[r]{}
 %\renewcommand{\footrulewidth}{1pt}
@@ -347,7 +349,7 @@
     \subsubsection{Question 2.5}
 
 	We will now add zero-mean, Gaussian white noise with variance of 0.01 to \cref{sub:Bib} via matlab \texttt{imnoise(I,'gaussian')} function. The noisy image looks like \cref{fig:Noisy}, it has an SNR (signal to noise ratio) of 7.41 and clearly looks noisy. The SNR was computed via
-	\begin{equation}
+	\begin{equation} \label{eq:SNR}
 		\texttt{SNR} = 10 \log_{10}{\frac{\|\hat{A}\|_F}{\|\hat{A}-A\|_F}}
 	\end{equation}
 	With $A$ the tensor representing the image, $\hat{A}$ the reconstructed image, in the above case $\hat{A}$ is the noisy image.
@@ -358,7 +360,7 @@
 	\label{fig:Noisy}
 \end{figure}
 
-	We will test the denosing procedure for both hard and soft thresholding, for a range of $\delta = p T$'s, with $T$ the max of the wavelet coefficients of the 3 RGB colors and $p \in [0,1]$. 100 equidistant $p$'s were tested, obtained from matlab \texttt{linspace(0,1,100)}. \\
+	We will test the denosing procedure for both hard and soft thresholding, for a range of $\delta = p T$'s, with $T$ the max of the wavelet coefficients of the 3 RGB colors and $p \in [0,1]$. 10 equidistant $p$'s were tested, obtained from matlab \texttt{linspace(\texttt{1e-1},1,10)}. \\
 	The tested wavelets range from (For 4 level deep)
 	\begin{itemize}
 		\item Daubechies (orthogonal): \texttt{"db1",...,"db45"}
@@ -389,10 +391,9 @@
 	\includegraphics[trim={0cm 6cm 0cm 5.5cm},clip,width=0.7\textwidth]{Images/CustomBib.pdf}
 	\caption{Recontructed image from \cref{fig:Noisy}. Using threshold of 41.71, soft thresholding and \texttt{db30} for the wavelet}
 	\label{fig:CusBib}
-	
-	The better image is a matter of preference.
-	
 \end{figure}
+	
+	The better image is a matter of preference, noisy vs blurry, whichever one is preferred. If just the \texttt{SNR} metric is used then \cref{fig:RecBib}, is optimal.
 	
 	\begin{comment}
 \begin{table}[H]
@@ -407,20 +408,70 @@
 \end{table}
 	\end{comment}
 	
-	
-	
 	%However the parameters are not generalizable since these are the best parameters for this denoising this specific image with gaussian noise, for different type of noise and image the optimal parameters might be different.
 	
     \subsection{Using a redundant wavelet transform}
 
     \subsubsection{Task 2.6}
 
+	An image is composed of 3 different matrices, each representing the value of the color red,blue and green. To denoise an image, the following steps will be executed:
+\begin{enumerate}
+	\item Separate image (tensor) into 3 matrices representing the 3 RGB colors
+	\item Compute the 2D stationary wavelet transform for each of the 3 matrices
+	\item Apply a thresholding scheme to the wavelet coefficients, for the 3 different colors
+	\item Compute the inverse 2D stationary wavelet transform, for the 3 different colors
+	\item Recombine the denoised color matrices into 1 image (tensor)
+\end{enumerate}
+
     \subsubsection{Question 2.7}
+	Since we are dealing with image denoising, the wavelet families to test on are Daubechies or biorthogonal CDF's. \\
+
+	We will test the redundant and standard wavelet-based denoising scheme on \cref{fig:Noisy}, for both hard and soft thresholding, for a range of $\delta = p T$'s, with $T$ the max of the wavelet coefficients of the 3 RGB colors and $p \in [0,1]$. 10 equidistant $p$'s were tested, obtained from matlab \texttt{linspace(\texttt{1e-3},1,10)}. \\
+The tested wavelets range from (For 2 level deep)
+\begin{itemize}
+	\item Daubechies (orthogonal): \texttt{"db1",...,"db45"}
+	\item BiorSplines (biorthgonal): \texttt{"bior1.1", "bior1.3", "bior1.5"
+		"bior2.2", "bior2.4", "bior2.6", "bior2.8"
+		"bior3.1", "bior3.3", "bior3.5", "bior3.7"
+		"bior3.9", "bior4.4", "bior5.5", "bior6.8"}	
+	\item ReverseBior (biorthogonal): \texttt{	"rbio1.1", "rbio1.3", "rbio1.5"
+		"rbio2.2", "rbio2.4", "rbio2.6", "rbio2.8"	
+		"rbio3.1", "rbio3.3", "rbio3.5", "rbio3.7"
+		"rbio3.9", "rbio4.4", "rbio5.5", "rbio6.8"}
+\end{itemize}
+3000 different combinations were tested, only the best for both the redundant and standard scheme will be shown (for obvious reasons) \footnote{To run the tests and recreate \cref{fig:Rec}, run \texttt{ex2point3.m}}. The quality metric is \texttt{SNR} (The higher the better), see \cref{eq:SNR}.\\
+
+The best parameters for standard wavelet transform are: threshold of 42, using hard thesholding, wavelet is \texttt{"db1"} .We get \texttt{SNR = }, see \cref{sub:RecStd}.\\
+The best parameters for redundant wavelet transform are: threshold of 42, using hard thesholding, wavelet is \texttt{"db1"} .We get \texttt{SNR = }, see \cref{sub:RecRed}.\\
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.49\textwidth}
+		\centering
+		%trim={<left> <lower> <right> <upper>}
+		%\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=.49\textwidth]{Images/LQG_weighted4.pdf}
+		\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=1\textwidth]{Images/BibRecStd.pdf}
+		\caption{Picture of a library, reconstructed via standard wavelet transform}
+		\label{sub:RecStd}
+	\end{subfigure}
+	\begin{subfigure}{0.49\textwidth}
+		\centering
+		%trim={<left> <lower> <right> <upper>}
+		%\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=.49\textwidth]{Images/LQG_weighted4.pdf}
+		\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=1\textwidth]{Images/BibRed.pdf}
+		\caption{Picture of a library, reconstructed via redundant wavelet transform}
+		\label{sub:RecRed}
+	\end{subfigure}
+	\caption{Picture of a library (taken from personal phone), for different values of hard threshold. Using wavelets of decomposition level 2}
+	\label{fig:Rec}
+\end{figure}
 
     \subsubsection{Question 2.8}
 
     \subsubsection{Task 2.9}
 
+	\newpage
+	
     \section{Wavelet-based inpainting}
 
     \subsection{An iterative algorithm}
@@ -432,5 +483,30 @@
     \subsubsection{Question 3.3}
 
     \subsubsection{Question 3.4}
+
+	\newpage
+
+	\appendix
+	
+	\section{Tables}
+	
+	\begin{longtable}{| p{.20\textwidth} | p{.80\textwidth} |} 
+	\hline
+	foo & bar \\ \hline 
+	foo & bar \\ \hline
+	foo & bar \\ \hline
+	foo & bar \\ \hline
+	foo & bar \\ \hline
+	foo & bar \\ \hline
+	foo & bar \\ \hline
+	foo & bar \\ \hline
+	foo & bar \\ \hline
+	foo & bar \\ \hline
+	foo & bar \\ \hline
+	\caption{Your caption here} % needs to go inside longtable environment
+	\label{tab:myfirstlongtable}
+\end{longtable}
+
+	\section{Code}
 
  \end{document}
