@@ -22,7 +22,7 @@ rng(42)
 %A_noise = imnoise(A,'salt & pepper');
 %A_noise = imnoise(A,'speckle');
 A_noise = imnoise(A,"gaussian");
-SNR = 10*log10(norm(double(A_noise),'fro')/(norm(double(A_noise)-double(A),'fro')));
+SNR = 10*log10(norm(double(A),'fro')/(norm(double(A)-double(A_noise),'fro')));
 %msNoise = sqrt(sum(sum(sum( (A_noise-A).^2 ))) / length(A(:)));
 msNoise = norm(double(A_noise)-double(A),'fro');
 % Plot the noisy image
@@ -60,9 +60,10 @@ SNRMat = zeros(length(thesholding),length(wavelets),length(p));
 ThreshMat = zeros(length(thesholding),length(wavelets),length(p));
 % mprev = +inf;
 % BestImage = A_noise;
+n = length(wavelets)*length(thesholding); index = 1;
+progressbar
 for i = 1:length(thesholding)
     thesholdType = thesholding(i);
-    progressbar
     for j = 1:length(wavelets)
         wave = wavelets(j);
         for k = 1:length(p)
@@ -75,12 +76,13 @@ for i = 1:length(thesholding)
             % end
             % mprev = mserr;
         end
-        progressbar(j/length(wavelets));
+        progressbar(index/n);
+        index = index + 1;
     end
 end
-save Data.mat ThreshMat SNRMat
+%save Data.mat ThreshMat SNRMat
 %% plot best image
-%load Data.mat
+load Data.mat
 
 ibest = 1;
 jbest = 1;
@@ -96,7 +98,7 @@ for i = 1:size(SNRMat,1)
     end
 end
 BestThresh = ThreshMat(ibest,jbest,kbest);
-[BestImage,~,~,~,~,SNR] = denoising_image(A_noise,p(kbest),thesholding(ibest),wavelets(jbest),A);
+[BestImage,~,~,~,TR,SNR] = denoising_image(A_noise,p(kbest),thesholding(ibest),wavelets(jbest),A);
 % Plot the result after denosing for best params
 figure
 imshow(BestImage)
@@ -163,7 +165,7 @@ function [A2,mserr,mserr_rel,compression_ratio,threshold,SNR] = denoising_image(
     % if condition true we are denoising, thus can compute the signal to
     % noise ratio
     if nargin >= 5
-        SNR = 10*log10(norm(A2,'fro')/(norm(A2-double(A),'fro')));
+        SNR = 10*log10(norm(double(A),'fro')/(norm(double(A)-A2,'fro')));
     end
     
     A2 = uint8(A2);

@@ -10,9 +10,9 @@ imshow(A)
 % add noise to image
 rng(42)
 
-%A_noise = imnoise(A,'salt & pepper',0.01);
+A_noise = imnoise(A,'salt & pepper',0.01);
 %A_noise = imnoise(A,'speckle');
-A_noise = imnoise(A,"gaussian");
+%A_noise = imnoise(A,"gaussian");
 SNR = 10*log10(norm(double(A_noise),'fro')/(norm(double(A_noise)-double(A),'fro')));
 %msNoise = sqrt(sum(sum(sum( (A_noise-A).^2 ))) / length(A(:)));
 msNoise = norm(double(A_noise)-double(A),'fro');
@@ -113,10 +113,10 @@ for l = 1:length(TypeTransform)
         end
     end
 end
-save Data2.mat ThreshMat SNRMat
+%save Data2.mat ThreshMat SNRMat
 %% plot best image
 %load Data.mat
-l = 1; % 1 is redundant, 2 is standard
+l = 2; % 1 is redundant, 2 is standard
 ibest = 1;
 jbest = 1;
 kbest = 1;
@@ -131,7 +131,7 @@ for i = 1:size(SNRMat,2)
     end
 end
 BestThresh = ThreshMat(l,ibest,jbest,kbest);
-[BestImage,~,~,thr,SNR] = denoising_image(A_noise,wavelets(jbest),p(kbest),TypeTransform(l),thesholding(ibest),Level,A);
+[BestImage,mserr,mserr_rel,thr,SNR] = denoising_image(A_noise,wavelets(jbest),p(kbest),TypeTransform(l),thesholding(ibest),Level,A);
 % Plot the result after denosing for best params
 figure
 imshow(BestImage)

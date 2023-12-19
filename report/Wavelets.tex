@@ -348,9 +348,9 @@
 
     \subsubsection{Question 2.5}
 
-	We will now add zero-mean, Gaussian white noise with variance of 0.01 to \cref{sub:Bib} via matlab \texttt{imnoise(I,'gaussian')} function. The noisy image looks like \cref{fig:Noisy}, it has an SNR (signal to noise ratio) of 7.41 and clearly looks noisy. The SNR was computed via
+	We will now add zero-mean, Gaussian white noise with variance of 0.01 to \cref{sub:Bib} via matlab \texttt{imnoise(I,'gaussian')} function. The noisy image looks like \cref{fig:Noisy}, it has an SNR (signal to noise ratio) of 7.36 and clearly looks noisy. The SNR was computed via
 	\begin{equation} \label{eq:SNR}
-		\texttt{SNR} = 10 \log_{10}{\frac{\|\hat{A}\|_F}{\|\hat{A}-A\|_F}}
+		\texttt{SNR} = 10 \log_{10}{\frac{\|A\|_F}{\|A-\hat{A}\|_F}}
 	\end{equation}
 	With $A$ the tensor representing the image, $\hat{A}$ the reconstructed image, in the above case $\hat{A}$ is the noisy image.
     \begin{figure}[H]
@@ -384,7 +384,7 @@
 	\label{fig:RecBib}
 \end{figure}
 	
-	By trial and error, we get the following parameters: threshold of 41.71, \texttt{db30} as wavelet and \texttt{SNR = 6.7} using soft thresholding. As we can see in \cref{fig:CusBib}, the image feels less noisy but more blurry.
+	By trial and error, we get the following parameters: threshold of 41.71, \texttt{db30} as wavelet and \texttt{SNR = 6.94} using soft thresholding. As we can see in \cref{fig:CusBib}, the image feels less noisy but more blurry.
 	
     \begin{figure}[H]
 	\centering
@@ -458,7 +458,7 @@ The best parameters for redundant wavelet transform are: threshold of 42, using 
 		\centering
 		%trim={<left> <lower> <right> <upper>}
 		%\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=.49\textwidth]{Images/LQG_weighted4.pdf}
-		\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=1\textwidth]{Images/BibRed.pdf}
+		\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=1\textwidth]{Images/BibRecRed.pdf}
 		\caption{Picture of a library, reconstructed via redundant wavelet transform}
 		\label{sub:RecRed}
 	\end{subfigure}
