@@ -30,11 +30,12 @@ imshow(A_noise)
 %[ca3,chd3,cvd3,cdd3] = swt2(Ablue(:,1:1348),2,'db6');
 
 % make sure the image is rows and colums can be divided by 2^Level
-Level = 2;
-select = 1:1348; % hardcoded
+Level = 4;
+select1 = 1:896;
+select2 = 1:1344; % hardcoded
 
-A = A(:,select,:);
-A_noise = A_noise(:,select,:);
+A = A(select1,select2,:);
+A_noise = A_noise(select1,select2,:);
 Ared = A_noise(:,:,1);
 Agreen = A_noise(:,:,2);
 Ablue = A_noise(:,:,3);
@@ -45,12 +46,12 @@ imshow(A_noise)
 %%
 
 % parameters for decomposition
-wave = "db1"; rel_threhold = 1e-2;
+wave = "bior4.4"; rel_threhold = 1e-1;
 type = "redundant";
 %type = "other";
-threshold_type = "Hard";
+threshold_type = "Soft";
 
-[A2red,A2green,A2blue,temp] = denoise_tensor(Ared,Agreen,Ablue,wave,rel_threhold,type,threshold_type,Level);
+[A2red,A2green,A2blue,temp] = denoise_tensor(Ared,Agreen,Ablue,wave,rel_threhold,type,threshold_type,1);
 
 A2 = zeros(size(A));
 A2(:,:,1) = A2red;

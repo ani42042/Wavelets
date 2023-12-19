@@ -6,7 +6,7 @@ figure
 imshow(A)
 
 %% compress image
-p = 1e-3; thresholdType = 'Hard'; waveletType = 'bior4.4';
+p = 9e-3; thresholdType = 'Soft'; waveletType = 'db30';
 A_noise = A;
 [A2,mserr,mserr_rel,compression_ratio,threshold,SNR] = denoising_image(A_noise,p,thresholdType,waveletType,A);
 
@@ -19,10 +19,10 @@ imshow(A2)
 % add noise to image
 rng(42)
 
-%A_noise = imnoise(A,'salt & pepper');
+A_noise = imnoise(A,'salt & pepper',0.01);
 %A_noise = imnoise(A,'speckle');
-A_noise = imnoise(A,"gaussian");
-SNR = 10*log10(norm(double(A),'fro')/(norm(double(A)-double(A_noise),'fro')));
+%A_noise = imnoise(A,"gaussian");
+SNR_noise = 10*log10(norm(double(A),'fro')/(norm(double(A)-double(A_noise),'fro')));
 %msNoise = sqrt(sum(sum(sum( (A_noise-A).^2 ))) / length(A(:)));
 msNoise = norm(double(A_noise)-double(A),'fro');
 % Plot the noisy image
@@ -30,7 +30,7 @@ figure
 imshow(A_noise)
 
 %% Denoise image
-p = 9e-3; thresholdType = 'Soft'; waveletType = 'db30'; 
+p = 6e-3; thresholdType = 'Soft'; waveletType = 'db30'; 
 [A2,mserr,mserr_rel,compression_ratio,threshold,SNR] = denoising_image(A_noise,p,thresholdType,waveletType,A);
 
 % Plot the result after denosing/compression
@@ -80,23 +80,24 @@ for i = 1:length(thesholding)
         index = index + 1;
     end
 end
-%save Data.mat ThreshMat SNRMat
+save Data.mat ThreshMat SNRMat
 %% plot best image
-load Data.mat
+%load Data.mat
 
 ibest = 1;
 jbest = 1;
 kbest = 1;
-bestSNR = SNRMat(ibest,jbest,kbest)
+bestSNR = SNRMat(ibest,jbest,kbest);
 for i = 1:size(SNRMat,1)
     for j=1:size(SNRMat,2)
         for k=1:size(SNRMat,3)
-            if (bestSNR < SNRMat(i,j,k))
+            if (bestSNR <= SNRMat(i,j,k))
                 bestSNR = SNRMat(i,j,k); ibest = i; jbest = j; kbest = k;
             end
         end
     end
 end
+bestSNR
 BestThresh = ThreshMat(ibest,jbest,kbest);
 [BestImage,~,~,~,TR,SNR] = denoising_image(A_noise,p(kbest),thesholding(ibest),wavelets(jbest),A);
 % Plot the result after denosing for best params
@@ -165,7 +166,7 @@ function [A2,mserr,mserr_rel,compression_ratio,threshold,SNR] = denoising_image(
     % if condition true we are denoising, thus can compute the signal to
     % noise ratio
     if nargin >= 5
-        SNR = 10*log10(norm(double(A),'fro')/(norm(double(A)-A2,'fro')));
+        SNR = 10*log10(norm(double(A_correct),'fro')/(norm(double(A_correct)-A2,'fro')));
     end
     
     A2 = uint8(A2);

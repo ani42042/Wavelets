@@ -137,11 +137,11 @@
     	f_j = f(x_j) && x_j = -2 + 4\frac{j-1}{N-1}, \quad j=1,\ldots,N
     \end{align*}
     
-    We compute the wavelet transform of the vector $f = \{f_j\}_{j=1}^N$ using the Daubechies 2 wavelet of 4 levels deep. boundary conditions used is: Symmetrization (half-point). These same parameters are used for the rest of \cref{subsec:UniVariate}.
+    We compute the wavelet transform of the vector $f = \{f_j\}_{j=1}^N$ using the Daubechies 2 wavelet of 5 levels deep. boundary conditions used is: Symmetrization (half-point). These same parameters are used for the rest of \cref{subsec:UniVariate}.
     \begin{figure}[H]
 	\centering
 	\includegraphics[trim={3.5cm 8cm 4cm 9cm},clip,width=0.7\textwidth]{Images/Coefficents.pdf}
-	\caption{Coefficients of Wavelet transform (4 levels deep, using the Daubechies 2, $N=1000$ sample points, between $[-2,2]$. DWT Extension Mode: Symmetrization (half-point)}
+	\caption{Coefficients of Wavelet transform (5 levels deep, using the Daubechies 2, $N=1000$ sample points, between $[-2,2]$. DWT Extension Mode: Symmetrization (half-point)}
 	\label{fig:Coeff}
     \end{figure}
 
@@ -348,19 +348,19 @@
 
     \subsubsection{Question 2.5}
 
-	We will now add zero-mean, Gaussian white noise with variance of 0.01 to \cref{sub:Bib} via matlab \texttt{imnoise(I,'gaussian')} function. The noisy image looks like \cref{fig:Noisy}, it has an SNR (signal to noise ratio) of 7.36 and clearly looks noisy. The SNR was computed via
+	We will now add salt and pepper noise to \cref{sub:Bib} via matlab \texttt{imnoise(I,'salt \& pepper',0,01)} function, with 0.01 as noise density (affects approximately 0.01 times the number of pixels). The noisy image looks like \cref{fig:Noisy}, it has an SNR (signal to noise ratio) of 9.301 and clearly looks noisy. The SNR was computed via
 	\begin{equation} \label{eq:SNR}
 		\texttt{SNR} = 10 \log_{10}{\frac{\|A\|_F}{\|A-\hat{A}\|_F}}
 	\end{equation}
-	With $A$ the tensor representing the image, $\hat{A}$ the reconstructed image, in the above case $\hat{A}$ is the noisy image.
+	With $A$ the tensor representing the image, $\hat{A}$ the reconstructed or noisy image.
     \begin{figure}[H]
 	\centering
 	\includegraphics[trim={0cm 6cm 0cm 5.5cm},clip,width=0.7\textwidth]{Images/NoisyBib.pdf}
-	\caption{\cref{sub:Bib} with added zero-mean, Gaussian white noise with variance of 0.01. Added via matlab \texttt{imnoise(I,'gaussian')}}
+	\caption{\cref{sub:Bib} with salt and pepper noise fo density 0.01, added via matlab \texttt{imnoise(I,'salt \& pepper',0,01)}}
 	\label{fig:Noisy}
 \end{figure}
 
-	We will test the denosing procedure for both hard and soft thresholding, for a range of $\delta = p T$'s, with $T$ the max of the wavelet coefficients of the 3 RGB colors and $p \in [0,1]$. 10 equidistant $p$'s were tested, obtained from matlab \texttt{linspace(\texttt{1e-1},1,10)}. \\
+	We will test the denosing procedure for both hard and soft thresholding, for a range of $\delta = p T$'s, with $T$ the max of the wavelet coefficients of the 3 RGB colors and $p \in [0,1]$. 10 equidistant $p$'s were tested, obtained from matlab \texttt{linspace(\texttt{1e-3},1,10)}. \\
 	The tested wavelets range from (For 4 level deep)
 	\begin{itemize}
 		\item Daubechies (orthogonal): \texttt{"db1",...,"db45"}
@@ -375,16 +375,16 @@
 	\end{itemize}
 	1500 different combinations were tested, only the best will be shown (for obvious reasons) \footnote{To run the tests and recreate \cref{fig:Bib,fig:Noisy,fig:RecBib,fig:CusBib}, run \texttt{ex2point2.m}} \\
 	
-	The best parameters will be determined using the SNR metric (the higher the better), of course in practice the clean image is usually not available, so the "eyeball" norm would have to be use. The best parameters according to \texttt{SNR} are: \texttt{rbio2.4} for the wavelet, threshold of 3.89 and a $\texttt{SNR} = \texttt{15.36}$, using hard thresholding. See \cref{fig:RecBib} for the resulting recontructed image. It looks a little more whitened, but otherwise looks the same as the noisy figure. The results are pretty underwhelming.
+	The best parameters will be determined using the SNR metric (the higher the better), of course in practice the clean image is usually not available, so the "eyeball" norm would have to be use. The best parameters according to \texttt{SNR} are: \texttt{db45} for the wavelet, threshold of 4.902 and a $\texttt{SNR} = \texttt{9.8}$, using soft thresholding. See \cref{fig:RecBib} for the resulting recontructed image. It still looks quite noisy figure. The results are pretty underwhelming.
 
     \begin{figure}[H]
 	\centering
 	\includegraphics[trim={0cm 6cm 0cm 5.5cm},clip,width=0.7\textwidth]{Images/RecontructedBib.pdf}
-	\caption{Recontructed image from \cref{fig:Noisy}. Using threshold of 3.89, hard thresholding and \texttt{rbio2.4} for the wavelet}
+	\caption{Recontructed image from \cref{fig:Noisy}. Using threshold of 4.902, hard thresholding and \texttt{db45} for the wavelet}
 	\label{fig:RecBib}
 \end{figure}
 	
-	By trial and error, we get the following parameters: threshold of 41.71, \texttt{db30} as wavelet and \texttt{SNR = 6.94} using soft thresholding. As we can see in \cref{fig:CusBib}, the image feels less noisy but more blurry.
+	By trial and error, we get the following parameters: threshold of 28.15, \texttt{db30} as wavelet and \texttt{SNR = 8.89} using soft thresholding. As we can see in \cref{fig:CusBib}, the image feels less noisy but more blurry.
 	
     \begin{figure}[H]
 	\centering
@@ -393,7 +393,7 @@
 	\label{fig:CusBib}
 \end{figure}
 	
-	The better image is a matter of preference, noisy vs blurry, whichever one is preferred. If just the \texttt{SNR} metric is used then \cref{fig:RecBib}, is optimal.
+	The better image is a matter of preference, noisy vs blurry, whichever one is preferred. If just the \texttt{SNR} metric is used, then \cref{fig:RecBib}, is optimal.
 	
 	\begin{comment}
 \begin{table}[H]
