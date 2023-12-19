@@ -60,6 +60,7 @@ SNRMat = zeros(length(thesholding),length(wavelets),length(p));
 ThreshMat = zeros(length(thesholding),length(wavelets),length(p));
 % mprev = +inf;
 % BestImage = A_noise;
+%%
 n = length(wavelets)*length(thesholding); index = 1;
 progressbar
 for i = 1:length(thesholding)
@@ -82,7 +83,7 @@ for i = 1:length(thesholding)
 end
 save Data.mat ThreshMat SNRMat
 %% plot best image
-%load Data.mat
+load Data.mat
 
 ibest = 1;
 jbest = 1;
