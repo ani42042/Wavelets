@@ -1,5 +1,5 @@
 % Use 1000 equispaced points on the interval [-1,1].
-t = linspace(-2, 2, 1000);
+t = linspace(-2, 2, 1008);
 
 % Sample a smooth function
 y = abs(t) .*(2+cos(t)) .* sign(t);
@@ -9,14 +9,19 @@ y = abs(t) .*(2+cos(t)) .* sign(t);
 
 % Compute its wavelet transform, four levels deep, using the Daubechies 2
 % wavelet.
-Level = 2;
-[c,l] = wavedec(y, 2, 'db2');
-[c,l,a,b] = swt(y, Level, wavelet);
+Level = 4;
+wavelet = "db2";
+swc = swt(y, Level, wavelet);
 % Visualize the coefficients on a logarithmic scale.
 % Try to explain what you see! Experiment with other wavelets and, again,
 % try to understand the different results.
 figure
-semilogy(abs(c));
+semilogy(abs(swc(1,:)));
+%hold on
+%for i = 1:Level
+%    semilogy(abs(swc(i,:)));
+%end
+%hold off
 xlabel("$i$",Interpreter="latex");
 ylabel("$|c_i|$",Interpreter="latex");
 
@@ -24,10 +29,13 @@ ylabel("$|c_i|$",Interpreter="latex");
 
 % apply wavelet transform on signal with added noise
 rng(42)
-epsilon = 1e-1;
-noise = epsilon*rand(size(y));
+epsilon = 5e-1;
+%noise = epsilon*rand(size(y));
+noise = epsilon*randn(size(y));
 ynoise = y + noise;
-[cnoise,lnoise] = wavedec(ynoise, 5, 'db2');
+bias = mean(noise); %mean of uniform distrubution
+
+SNR_noise = 10*log10(norm(y,'fro')/norm(ynoise-y,'fro'));
 
 figure
 plot(t,y)
@@ -36,41 +44,22 @@ plot(t,ynoise)
 hold off
 xlabel("$t$",Interpreter="latex");
 ylabel("function",Interpreter="latex");
-legend("$f(t)$","$f(t)+\epsilon \mathcal{U}(0,1)$",Interpreter="latex")
-
+legend("$f(t)$","$f(t)+\epsilon \mathcal{N}(0,1)$",Interpreter="latex")
+%%
 % Find small coefficents and set them to zero.
 %T = max(abs(cnoise));
 %delta = 10e-4*T;
-delta = 1e-1;
+p = 1e-2; type = "redundant"; thresholdType = "Soft";
+wavelet = "db30";
 
-% change here what thresholding method wanted
-cnoiseInit = cnoise;
-[cnoise,I] = Hard_threshold(delta,cnoise);
-%[cnoise,I] = Soft_threshold(delta,cnoise);
+[y2,threshold] = denoise_func(ynoise,wavelet,p,type,thresholdType,Level);
+SNR = 10*log10(norm(y)/norm(y2-y));
 
-% How many coefficients did we put to zero:
-length(I)
-% out of a total of
-length(cnoise)
-% ratio put to 0
-(1-length(I)/length(cnoise))*100
-errCoeff = abs(c-cnoise);
-
-% coefficent error between real and thresholded noisy
-figure
-semilogy(errCoeff);
-xlabel("$i$",Interpreter="latex");
-ylabel("$|c_i-\hat{c}_i|$",Interpreter="latex");
-
-% Reconstruct the signal
-y2 = waverec(cnoise, lnoise, 'db2');
-% Plot the error on a logarithmic scale. Experiment with the threshold
-% above and see what the effect is
-bias = mean(noise); %mean of uniform distrubution
 %noiseMean = mean(abs(noise));
-err = abs(y-y2+bias);
+err = abs(y-y2);
 errTotal = norm(err)
 errTotalnoise = norm(noise)
+%% plots
 figure
 semilogy(t, err)
 hold on
@@ -81,54 +70,70 @@ xlabel("$t$",Interpreter="latex");
 ylabel("Errors",Interpreter="latex");
 legend("$|f(t_i)-\hat{f}(t_i)+mean(noise)|$",Interpreter="latex")
 
-%% Question 2.3
-
-x = linspace(-10,0,101);
-deltaList = 10.^x;
-errorList = zeros(size(deltaList));
-errorMat = zeros(length(t),length(deltaList))';
-F = zeros(length(t),length(deltaList))';
-errorCoeffList = zeros(size(deltaList));
-for i = 1:length(deltaList)
-    delta = deltaList(i);
-    %[cnoise,I] = Hard_threshold(delta,cnoiseInit);
-    [cnoise,I] = Soft_threshold(delta,cnoiseInit);
-    
-    errorCoeffList(i) = mse(c,cnoise);
-    % Reconstruct the signal
-    y2 = waverec(cnoise, lnoise, 'db2');
-    % Plot the error on a logarithmic scale. Experiment with the threshold
-    % above and see what the effect is
-    %noiseMean = mean(abs(noise));
-    F(i,:) = y2-bias;
-    errorMat(i,:) = abs(y-y2+bias);
-    %err = norm(abs(y-y2+bias));
-    err = mse(y,y2+bias);
-    errorList(i) = err;
-end
-[BestErr,index] = min(errorList);
-[BestErrCoeff,indexCoeff] = min(errorCoeffList);
-bestDelta = deltaList(indexCoeff)
-BestErrCoeff
-
-figure
-semilogy(t, errorMat(indexCoeff,:))
-hold on
-%semilogy(t, noise)
-yline(bias,Label="noise",Interpreter="latex")
-hold off
-xlabel("$t$",Interpreter="latex");
-ylabel("Errors",Interpreter="latex");
-legend("$|f(t_i)-\hat{f}(t_i)+mean(noise)|$",Interpreter="latex")
-
 figure
 plot(t,y)
 hold on
-plot(t,F(indexCoeff,:))
+plot(t,y2)
 hold off
 xlabel("$t$",Interpreter="latex");
 ylabel("function",Interpreter="latex");
 legend("$f(t)$","$\hat{f}(t)-mean(noise)$",Interpreter="latex")
+
+%% Question 2.3
+
+deltaList = linspace(0,1,400);
+
+%type = "redundant"; 
+type = "other";
+wavelet = "db2";
+thresholdTypeList = ["Hard","Soft"];
+SNRList = zeros(length(thresholdTypeList),length(deltaList));
+
+for l = 1:length(thresholdTypeList)
+    thresholdType = thresholdTypeList(l);
+    for i = 1:length(deltaList)
+        delta = deltaList(i);
+        %[cnoise,I] = Hard_threshold(delta,cnoiseInit);
+        [y2,~] = denoise_func(ynoise,wavelet,delta,type,thresholdType,Level);
+        SNRList(l,i) = 10*log10(norm(y)/norm(y2-y));
+    end
+end
+
+%%
+
+ibest = 1;
+jbest = 1;
+bestSNR = SNRList(ibest,jbest);
+for i = 1:size(SNRList,1)
+    for j=1:size(SNRList,2)
+        if (bestSNR <= SNRList(i,j))
+            bestSNR = SNRList(i,j); ibest = i; jbest = j;
+        end
+    end
+end
+bestSNR
+
+[y2, BestTr] = denoise_func(ynoise,wavelet,deltaList(jbest),type,thresholdTypeList(ibest),Level);
+SNR = 10*log10(norm(y)/norm(y2-y));
+
+figure
+plot(t,y)
+hold on
+plot(t,y2)
+hold off
+xlabel("$t$",Interpreter="latex");
+ylabel("function",Interpreter="latex");
+legend("$f(t)$","$\hat{f}(t)$",Interpreter="latex")
+
+%noiseMean = mean(abs(noise));
+err = abs(y-y2);
+figure
+semilogy(t, err)
+%semilogy(t, noise)
+hold off
+xlabel("$t$",Interpreter="latex");
+ylabel("Errors",Interpreter="latex");
+legend("$|f(t_i)-\hat{f}(t_i)|$",Interpreter="latex")
 
 function [c,I] = Hard_threshold(delta, c)
     I = find(abs(c) < delta);
