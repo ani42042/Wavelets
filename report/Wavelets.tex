@@ -137,7 +137,8 @@
     	f_j = f(x_j) && x_j = -2 + 4\frac{j-1}{N-1}, \quad j=1,\ldots,N
     \end{align*}
     
-    We compute the wavelet transform of the vector $f = \{f_j\}_{j=1}^N$ using the Daubechies 2 wavelet of 5 levels deep. boundary conditions used is: Symmetrization (half-point). These same parameters are used for the rest of \cref{subsec:UniVariate}.
+    We compute the wavelet transform of the vector $f = \{f_j\}_{j=1}^N$ using the Daubechies 2 wavelet of 5 levels deep. boundary conditions used is: Symmetrization (half-point). These same parameters are used for the rest of \cref{subsec:UniVariate}. The wavelet transform is computed using matlab \texttt{wavedec} and it's inverse using \texttt{waverec}. One of former's outputs is an array of wavelet coefficients $x$, this array is later thresholded for the propose of denoising. The signal can then be reconstructed using \texttt{waverec}, one whose arguments is $x$.
+    
     \begin{figure}[H]
 	\centering
 	\includegraphics[trim={3.5cm 8cm 4cm 9cm},clip,width=0.7\textwidth]{Images/Coefficents.pdf}
@@ -282,14 +283,14 @@
 
     \subsection{Images with noise}
 
-    \subsubsection{Task 2.4}
+    \subsubsection{Task 2.4} \label{subsubsec:Denoising}
 	An image is composed of 3 different matrices, each representing the value of the color red,blue and green. To denoise an image, the following steps will be executed:
 	\begin{enumerate}
-		\item Separate image (tensor) into 3 matrices representing the 3 RGB colors
-		\item Compute the 2D wavelet transform for each of the 3 matrices
-		\item Apply a thresholding scheme to the wavelet coefficients, for the 3 different colors
-		\item Compute the inverse 2D wavelet transform, for the 3 different colors
-		\item Recombine the denoised color matrices into 1 image (tensor)
+		\item Separate image (multidimensional array) into 3 matrices representing the 3 RGB colors
+		\item Compute the 2D wavelet transform using matlab \texttt{wavedec2} for each of the 3 matrices. We will then have 3 different wavelet coefficient array's.
+		\item Apply a thresholding scheme to the wavelet coefficients, for the 3 different colors (arrays)
+		\item Compute the inverse 2D wavelet transform using matlab \texttt{wavrec2}, for the 3 different colors (arrays)
+		\item Recombine the denoised color matrices into 1 image (multidimensional array)
 	\end{enumerate}
 	Since we are dealing with image denoising, the wavelet families to test on are Daubechies or biorthogonal CDF's. \\
 
@@ -346,13 +347,13 @@
 	\label{fig:Bib}
 \end{figure}
 
-    \subsubsection{Question 2.5}
+    \subsubsection{Question 2.5} \label{subsubsec:stdWave}
 
 	We will now add salt and pepper noise to \cref{sub:Bib} via matlab \texttt{imnoise(I,'salt \& pepper',0,01)} function, with 0.01 as noise density (affects approximately 0.01 times the number of pixels). The noisy image looks like \cref{fig:Noisy}, it has an SNR (signal to noise ratio) of 9.301 and clearly looks noisy. The SNR was computed via
 	\begin{equation} \label{eq:SNR}
 		\texttt{SNR} = 10 \log_{10}{\frac{\|A\|_F}{\|A-\hat{A}\|_F}}
 	\end{equation}
-	With $A$ the tensor representing the image, $\hat{A}$ the reconstructed or noisy image.
+	With $A$ the multidimensional array representing the image, $\hat{A}$ the reconstructed or noisy image.
     \begin{figure}[H]
 	\centering
 	\includegraphics[trim={0cm 6cm 0cm 5.5cm},clip,width=0.7\textwidth]{Images/NoisyBib.pdf}
@@ -384,7 +385,7 @@
 	\label{fig:RecBib}
 \end{figure}
 	
-	By trial and error, we get the following parameters: threshold of 28.15, \texttt{db30} as wavelet and \texttt{SNR = 8.89} using soft thresholding. As we can see in \cref{fig:CusBib}, the image feels less noisy but more blurry.
+	Let us take a trial and error approach with the eyeball norm as quality metric. we get the following parameters: threshold of 28.15, \texttt{db30} as wavelet and \texttt{SNR = 8.89} using soft thresholding. As we can see in \cref{fig:CusBib}, the image feels less noisy but more blurry.
 	
     \begin{figure}[H]
 	\centering
@@ -416,18 +417,18 @@
 
 	An image is composed of 3 different matrices, each representing the value of the color red,blue and green. To denoise an image, the following steps will be executed:
 \begin{enumerate}
-	\item Separate image (tensor) into 3 matrices representing the 3 RGB colors
-	\item Compute the 2D stationary wavelet transform for each of the 3 matrices
-	\item Apply a thresholding scheme to the wavelet coefficients, for the 3 different colors
-	\item Compute the inverse 2D stationary wavelet transform, for the 3 different colors
-	\item Recombine the denoised color matrices into 1 image (tensor)
+	\item Separate image (multidimensional array) into 3 matrices representing the 3 RGB colors
+	\item Compute the 2D stationary wavelet transform using matlab \texttt{swt2} for each of the 3 matrices. The ouptut of the \texttt{swt2} gives us a multidimensional array, containing the approximation and detail coefficients
+	\item Apply a thresholding scheme to the approximation and detail coefficients, for the 3 different colors (multidimensional arrays)
+	\item Compute the inverse 2D stationary wavelet transform matlab \texttt{iswt}, for the 3 different colors (multidimensional arrays)
+	\item Recombine the denoised color matrices into 1 image (multidimensional array)
 \end{enumerate}
 
     \subsubsection{Question 2.7}
 	Since we are dealing with image denoising, the wavelet families to test on are Daubechies or biorthogonal CDF's. \\
 
-	We will test the redundant and standard wavelet-based denoising scheme on \cref{fig:Noisy}, for both hard and soft thresholding, for a range of $\delta = p T$'s, with $T$ the max of the wavelet coefficients of the 3 RGB colors and $p \in [0,1]$. 10 equidistant $p$'s were tested, obtained from matlab \texttt{linspace(\texttt{1e-3},1,10)}. \\
-The tested wavelets range from (For 2 level deep)
+	We will test the redundant wavelet-based denoising scheme on \cref{fig:Noisy}, for both hard and soft thresholding, for a range of $\delta = p T$'s, with $T$ the max of the wavelet coefficients of the 3 RGB colors and $p \in [0,1]$. 10 equidistant $p$'s were tested, obtained from matlab \texttt{linspace(\texttt{1e-3},1,10)}. \\
+The tested wavelets range from (For 4 level deep)
 \begin{itemize}
 	\item Daubechies (orthogonal): \texttt{"db1",...,"db45"}
 	\item BiorSplines (biorthgonal): \texttt{"bior1.1", "bior1.3", "bior1.5"
@@ -439,32 +440,28 @@ The tested wavelets range from (For 2 level deep)
 		"rbio3.1", "rbio3.3", "rbio3.5", "rbio3.7"
 		"rbio3.9", "rbio4.4", "rbio5.5", "rbio6.8"}
 \end{itemize}
-3000 different combinations were tested, only the best for both the redundant and standard scheme will be shown (for obvious reasons) \footnote{To run the tests and recreate \cref{fig:Rec}, run \texttt{ex2point3.m}}. The quality metric is \texttt{SNR} (The higher the better), see \cref{eq:SNR}.\\
+1500 different combinations were tested, only the best for both the redundant and standard scheme will be shown (for obvious reasons) \footnote{To run the tests and recreate \cref{fig:RecRed,fig:RecCus}, run \texttt{ex2point3.m}}. The quality metric is \texttt{SNR} (The higher the better), see \cref{eq:SNR}.\\
 
-The best parameters for standard wavelet transform are: threshold of 42, using hard thesholding, wavelet is \texttt{"db1"} .We get \texttt{SNR = }, see \cref{sub:RecStd}.\\
-The best parameters for redundant wavelet transform are: threshold of 42, using hard thesholding, wavelet is \texttt{"db1"} .We get \texttt{SNR = }, see \cref{sub:RecRed}.\\
+%The best parameters for standard wavelet transform are: threshold of 42, using hard thesholding, wavelet is \texttt{"db1"} .We get \texttt{SNR = }, see \cref{sub:RecStd}.\\
+The best parameters for redundant wavelet transform are: threshold of 1.508, using soft thesholding, wavelet is \texttt{"db45"}.We get \texttt{SNR = 9.49}, see \cref{fig:RecRed}. The resulting figure still has quite a bit of noise. 	Compared to the standard wavelet transform in \cref{subsubsec:stdWave}, the redundant is slightly worse for similar parameters w/r to \texttt{SNR} metric.\\
 
-\begin{figure}[H]
+    \begin{figure}[H]
 	\centering
-	\begin{subfigure}{0.49\textwidth}
-		\centering
-		%trim={<left> <lower> <right> <upper>}
-		%\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=.49\textwidth]{Images/LQG_weighted4.pdf}
-		\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=1\textwidth]{Images/BibRecStd.pdf}
-		\caption{Picture of a library, reconstructed via standard wavelet transform}
-		\label{sub:RecStd}
-	\end{subfigure}
-	\begin{subfigure}{0.49\textwidth}
-		\centering
-		%trim={<left> <lower> <right> <upper>}
-		%\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=.49\textwidth]{Images/LQG_weighted4.pdf}
-		\includegraphics[trim={4cm 8cm 4cm 8cm},clip,width=1\textwidth]{Images/BibRecRed.pdf}
-		\caption{Picture of a library, reconstructed via redundant wavelet transform}
-		\label{sub:RecRed}
-	\end{subfigure}
-	\caption{Picture of a library (taken from personal phone), for different values of hard threshold. Using wavelets of decomposition level 2}
-	\label{fig:Rec}
+	\includegraphics[trim={0cm 6cm 0cm 5.5cm},clip,width=0.7\textwidth]{Images/BibRecRed.pdf}
+	\caption{Recontructed image from \cref{fig:Noisy}. Using redundant wavelet transform, a threshold of 1.508, soft thresholding and \texttt{db45} for the wavelet}
+	\label{fig:RecRed}
 \end{figure}
+
+	Let us take a trial and error approach with the eyeball norm as quality metric. we get the following parameters: threshold of 26.73, \texttt{db30} as wavelet and \texttt{SNR = 9.204} using soft thresholding. As we can see in \cref{fig:RecCus}, the image is less noisy but more blurry. Compared to the standard wavelet transform in \cref{subsubsec:stdWave}, the redundant is slightly better for similar parameters w/r to \texttt{SNR} metric.
+
+    \begin{figure}[H]
+	\centering
+	\includegraphics[trim={0cm 6cm 0cm 5.5cm},clip,width=0.7\textwidth]{Images/BibRecCus.pdf}
+	\caption{Recontructed image from \cref{fig:Noisy}. Using redundant wavelet transform, a threshold of 26.73, soft thresholding and \texttt{db30} for the wavelet}
+	\label{fig:RecCus}
+\end{figure}
+
+	 When comparing \cref{fig:RecCus,fig:RecRed}, even though \cref{fig:RecRed} has the higher \texttt{SNR}, \cref{fig:RecCus} looks like it has less noise. This is due to the fact that the additional blur and lowering in quality is too much of a price to pay to denoise properly, according to \texttt{SNR}.
 
     \subsubsection{Question 2.8}
 

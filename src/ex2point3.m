@@ -13,7 +13,7 @@ rng(42)
 A_noise = imnoise(A,'salt & pepper',0.01);
 %A_noise = imnoise(A,'speckle');
 %A_noise = imnoise(A,"gaussian");
-SNR = 10*log10(norm(double(A_noise),'fro')/(norm(double(A_noise)-double(A),'fro')));
+SNR = 10*log10(norm(double(A),'fro')/(norm(double(A_noise)-double(A),'fro')));
 %msNoise = sqrt(sum(sum(sum( (A_noise-A).^2 ))) / length(A(:)));
 msNoise = norm(double(A_noise)-double(A),'fro');
 % Plot the noisy image
@@ -31,8 +31,8 @@ imshow(A_noise)
 
 % make sure the image is rows and colums can be divided by 2^Level
 Level = 4;
-select1 = 1:896;
-select2 = 1:1344; % hardcoded
+select1 = 1:896; % hardcoded for specific image
+select2 = 1:1344; % hardcoded for specific image
 
 A = A(select1,select2,:);
 A_noise = A_noise(select1,select2,:);
@@ -46,12 +46,12 @@ imshow(A_noise)
 %%
 
 % parameters for decomposition
-wave = "bior4.4"; rel_threhold = 1e-1;
+wave = "db30"; rel_threhold = 5e-3;
 type = "redundant";
 %type = "other";
 threshold_type = "Soft";
 
-[A2red,A2green,A2blue,temp] = denoise_tensor(Ared,Agreen,Ablue,wave,rel_threhold,type,threshold_type,1);
+[A2red,A2green,A2blue,temp] = denoise_tensor(Ared,Agreen,Ablue,wave,rel_threhold,type,threshold_type,4);
 
 A2 = zeros(size(A));
 A2(:,:,1) = A2red;
@@ -59,7 +59,7 @@ A2(:,:,2) = A2green;
 A2(:,:,3) = A2blue;
 A2 = uint8(A2);
 
-SNR_denoise = 10*log10(norm(double(A2),'fro')/(norm(double(A2)-double(A),'fro')));
+SNR_denoise = 10*log10(norm(double(A),'fro')/(norm(double(A2)-double(A),'fro')));
 
 % Plot the result after compression
 figure
@@ -84,7 +84,8 @@ thesholding = ["Hard","Soft"];
 p = linspace(1e-3,1,10);
 Level = 2;
 type = "standard";
-TypeTransform = ["redundant","standard"];
+%TypeTransform = ["redundant","standard"];
+TypeTransform = ["redundant"];
 % parameters to store results
 SNRMat = zeros(length(TypeTransform),length(thesholding),length(wavelets),length(p));
 ThreshMat = zeros(length(TypeTransform),length(thesholding),length(wavelets),length(p));
@@ -117,20 +118,21 @@ end
 %save Data2.mat ThreshMat SNRMat
 %% plot best image
 %load Data.mat
-l = 2; % 1 is redundant, 2 is standard
+l = 1; % 1 is redundant, 2 is standard
 ibest = 1;
 jbest = 1;
 kbest = 1;
-bestSNR = SNRMat(l,ibest,jbest,kbest)
+bestSNR = SNRMat(l,ibest,jbest,kbest);
 for i = 1:size(SNRMat,2)
     for j=1:size(SNRMat,3)
         for k=1:size(SNRMat,4)
-            if (bestSNR < SNRMat(l,i,j,k))
+            if (bestSNR <= SNRMat(l,i,j,k))
                 bestSNR = SNRMat(l,i,j,k); ibest = i; jbest = j; kbest = k;
             end
         end
     end
 end
+bestSNR
 BestThresh = ThreshMat(l,ibest,jbest,kbest);
 [BestImage,mserr,mserr_rel,thr,SNR] = denoising_image(A_noise,wavelets(jbest),p(kbest),TypeTransform(l),thesholding(ibest),Level,A);
 % Plot the result after denosing for best params
@@ -156,7 +158,7 @@ function [A2,mserr,mserr_rel,threshold,SNR] = denoising_image(A,wave,rel_threhol
 
     % if condition true we are denoising, thus can compute the signal to
     % noise ratio
-    SNR = 10*log10(norm(A2,'fro')/(norm(A2-double(A),'fro')));
+    SNR = 10*log10(norm(double(A_correct),'fro')/(norm(double(A_correct)-A2,'fro')));
     
     A2 = uint8(A2);
     

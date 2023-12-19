@@ -23,7 +23,7 @@ function [B1,B2,B3,threshold] = denoise_tensor(A1,A2,A3,wavelet,p,type,threshold
         end
         swc1 = reshape(c1,sz2); swc2 = reshape(c2,sz2); swc3 = reshape(c3,sz2);
         %c1T(:,:,1) = c1; c2T(:,:,1) = c2; c3T(:,:,1) = c3;
-        zerodetails = zeros(size(c1));
+        %zerodetails = zeros(size(c1));
         B1 = iswt2(swc1, wavelet);
         B2 = iswt2(swc2, wavelet);
         B3 = iswt2(swc3, wavelet);
