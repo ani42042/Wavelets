@@ -413,7 +413,7 @@
 	
     \subsection{Using a redundant wavelet transform}
 
-    \subsubsection{Task 2.6}
+    \subsubsection{Task 2.6} \label{subsubsec:RedDen}
 
 	An image is composed of 3 different matrices, each representing the value of the color red,blue and green. To denoise an image, the following steps will be executed:
 \begin{enumerate}
@@ -529,19 +529,98 @@ The best parameters for redundant wavelet transform are: threshold of 1.508, usi
 	This means that unlike the standard wavelet transform which is critically sampled, the redundant transform has additional (redundant) information, which has the potential to have less loss of signal information during the thresholding.
     \subsubsection{Task 2.9}
 
+	Now finally let us test redundant wavelet transform on different kind of noise. Suppose $A$ represents our image, we apply
+	\begin{equation*}
+		\texttt{A(1:10:end,:)=0; A(:,1:10:end)=0;}
+	\end{equation*}
+	This creates a grid of lines every tenth row and every tenth column, the \texttt{SNR = 3.61} (\cref{eq:SNR}). See \footnote{To recreate \cref{fig:BibGrid,fig:BibGridRec,fig:BibGridRec2}, run \texttt{ex2point34.m}} \cref{fig:BibGrid}.\\
+	
+	Now lets try to apply the denoising scheme from \cref{subsubsec:RedDen}. We test the following parameters: 
+	\begin{itemize}
+		\item wavelet \texttt{db30}, soft thresholding and threshold of 86.79. The \texttt{SNR = 4.67}, which is higher then the initial noisy one. As we can see in \cref{fig:BibGridRec}, the grid lines are slowly fading away, the whole image seems to get darker and more blurry
+		\item wavelet \texttt{db30}, soft thresholding and threshold of \texttt{2.6e+02}. The \texttt{SNR = 3.9}, which is also higher then the initial noisy one. As we can see in \cref{fig:BibGridRec2}, the grid lines have faded away, the whole image is even darker and blurry 
+	\end{itemize}
+
+	Looking at \cref{fig:BibGridRec,fig:BibGridRec2}, it is clear that the denoising scheme is having some trouble. To get rid of the grid a large threshold is needed but at the cost of a massive loss in resolution. This is where \cref{sec:Inpainting} comes into play.
+
+    \begin{figure}[H]
+	\centering
+	\includegraphics[trim={0cm 6cm 0cm 5.5cm},clip,width=0.7\textwidth]{Images/BibGrid.pdf}
+	\caption{\cref{sub:Bib} "grid" noise, lines every tenth row and every tenth column}
+	\label{fig:BibGrid}
+\end{figure}	
+
+    \begin{figure}[H]
+	\centering
+	\includegraphics[trim={0cm 6cm 0cm 5.5cm},clip,width=0.7\textwidth]{Images/BibGridRec.pdf}
+	\caption{Recontruction of \cref{fig:BibGrid} using redundant wavelet transform, using \texttt{db30}, soft thresholding and threshold of 86.79}
+	\label{fig:BibGridRec}
+\end{figure}
+
+    \begin{figure}[H]
+	\centering
+	\includegraphics[trim={0cm 6cm 0cm 5.5cm},clip,width=0.7\textwidth]{Images/BibGridRec2.pdf}
+	\caption{Recontruction of \cref{fig:BibGrid} using redundant wavelet transform, using \texttt{db30}, soft thresholding and threshold of \texttt{2.6e+02}}
+	\label{fig:BibGridRec2}
+\end{figure}
+
 	\newpage
 	
-    \section{Wavelet-based inpainting}
+    \section{Wavelet-based inpainting} \label{sec:Inpainting}
 
     \subsection{An iterative algorithm}
 
-    \subsubsection{Task 3.1}
+\subsubsection{Task 3.1}
+We chose the previous image for the inpainting algorithm. From different experiments we chose 3 specific areas where the reconstruction was particularly interesting. The first area is the homogeneous blue sky. The second area is a window within the three windows and lastly we attempted to remove the all letters from "Bibliotheek" and pretended this was written on it. The correctness of the implementation was checked visually as well as the based on SNR sanity check. After masking the image, we chose spline interpolation to fill the zeros as initial guess. 
+\subsubsection{Question 3.2}
 
-    \subsubsection{Question 3.2}
+Figure \ref{softhardinpainting} highlights the difference between soft and hard thresholding in the case of the removal of the letter O. Soft thresholding gives slight but not significant better reconstruction based on SNR. The main difference however lies in the fact that soft thresholding performs equally well after inpainting masked matrix without interpolation and inpainting after interpolation. The hard thresholding had lower SNR for the case of inpainting the masked uninterpolated matrix. This is attributed to the fact that hard thresholding leaves the coefficients beyond the $\delta$ range unchanged while it shrinks those within the range. Since soft thresholding also shrinks the bigger coefficients outside the $\delta$ range, denoising with zeros as the missing elements removes noise in the outer regions aswell. As explained in chapter 10, the hard part was to find optimal threshold. Therefore a visual inspection was performed as the threshold was gradually decreased to come up with descent reconstruction.
 
-    \subsubsection{Question 3.3}
 
-    \subsubsection{Question 3.4}
+
+\begin{figure}[htb]
+	\centering % <-- added
+	\begin{subfigure}{0.4\textwidth}
+		\includegraphics[width=\linewidth]{Images/Hardthresholding_letterO.png}
+		\caption{10 seconds loaded}
+		\label{fig:1}
+	\end{subfigure}\hfil % <-- added
+	\begin{subfigure}{0.4\textwidth}
+		\includegraphics[width=\linewidth]{Images/Softthresholding_letterO.png}
+		\caption{50 seconds loaded}
+		\label{fig:2}
+	\end{subfigure}\hfil
+	\caption{Comparison of thresholding types: a: hard, b: soft}
+	\label{softhardinpainting}
+\end{figure}
+
+\subsubsection{Question 3.3}
+We performed the inpainting algorithm using the discrete stationary wavelet transform to compare redundant and non-redundant denoising. Firslty we observed that the reundant inpainting gave same results visually when the same masked region was not interpolated. This is was done out of expectation that it will performally equally well since downsampling is not involved. However the SNR was lower than the interpolated case. The redundant inpainting had slightly less lower performance (1dB difference) based on SNR but was visually much superior to the non-rendundant inpainting as seen in figures \ref{WorkingRed}
+and \ref{NonRedundBib}.
+\begin{figure}[htb]
+	\centering % <-- added
+	\includegraphics[width=0.9\linewidth]{Images/Redundant_all_letters.png}
+	\caption{Removing "Bibliotheek" with  redundant wavelet transform}
+	\label{WorkingRed}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering % <-- added
+	\includegraphics[width=1.1\linewidth]{Images/non-RedundantAllLeters.png}
+	\caption{Removing "Bibliotheek" with biorthogonal and hard thresholding}
+	\label{NonRedundBib}
+\end{figure}
+
+
+\subsubsection{Question 3.4}
+Figure \ref{windowaveletcomparer} shows the comparison between different wavelet families in the case of inpainting in a window inside the middle window. It can be seen that both haar wavelet and biorthogonal spline wavel 4.4 perform than the rest in terms of SNR. The reverse biothogonal spline has the lowest SNR. The highest SNR was achieved in the case of inpainting around homogeneous blue sky. The SNR was 40 dB for all wavelet families.
+
+\begin{figure}[htb]
+	\centering % <-- added
+	\includegraphics[width=0.7\linewidth]{Images/wavelet_comparison_window.png}
+	\caption{Comparison of different wavelet families}
+	\label{windowaveletcomparer}
+\end{figure}
 
 	\newpage
 
