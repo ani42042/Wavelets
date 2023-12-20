@@ -385,7 +385,7 @@
 			"rbio3.1", "rbio3.3", "rbio3.5", "rbio3.7"
 			"rbio3.9", "rbio4.4", "rbio5.5", "rbio6.8"}
 	\end{itemize}
-	1500 different combinations were tested, only the best will be shown (for obvious reasons) \footnote{To run the tests and recreate \cref{fig:Bib,fig:Noisy,fig:RecBib,fig:CusBib}, run \texttt{ex2point2.m}, see \cref{lst:ex2point2}} \\
+	1500 different combinations were tested, only the best will be shown here, see \cref{tab:SNRStdHard,tab:SNRStdSoft} for all of the results \footnote{To run the tests and recreate \cref{fig:Bib,fig:Noisy,fig:RecBib,fig:CusBib}, run \texttt{ex2point2.m}, see \cref{lst:ex2point2}} \\
 	
 	The best parameters will be determined using the SNR metric (the higher the better), of course in practice the clean image is usually not available, so the "eyeball" norm would have to be use. The best parameters according to \texttt{SNR} are: \texttt{db45} for the wavelet, threshold of 4.902 and a $\texttt{SNR} = \texttt{9.8}$, using soft thresholding. See \cref{fig:RecBib} for the resulting recontructed image. It still looks quite noisy figure. The results are pretty underwhelming.
 
@@ -451,7 +451,7 @@ The tested wavelets range from (For 4 level deep)
 		"rbio3.1", "rbio3.3", "rbio3.5", "rbio3.7"
 		"rbio3.9", "rbio4.4", "rbio5.5", "rbio6.8"}
 \end{itemize}
-1500 different combinations were tested, only the best for the redundant scheme will be shown (for obvious reasons) \footnote{To run the tests and recreate \cref{fig:RecRed,fig:RecCus}, run \texttt{ex2point3.m}, see \cref{lst:ex2point3}}. The quality metric is \texttt{SNR} (The higher the better), see \cref{eq:SNR}.\\
+1500 different combinations were tested, only the best for the redundant scheme will be shown, see \cref{tab:SNRRedHard,tab:SNRRedSoft} for all of the results \footnote{To run the tests and recreate \cref{fig:RecRed,fig:RecCus}, run \texttt{ex2point3.m}, see \cref{lst:ex2point3}}. The quality metric is \texttt{SNR} (The higher the better), see \cref{eq:SNR}.\\
 
 %The best parameters for standard wavelet transform are: threshold of 42, using hard thesholding, wavelet is \texttt{"db1"} .We get \texttt{SNR = }, see \cref{sub:RecStd}.\\
 The best parameters for redundant wavelet transform are: threshold of 1.508, using soft thesholding, wavelet is \texttt{"db45"}.We get \texttt{SNR = 9.49}, see \cref{fig:RecRed}. The resulting figure still has quite a bit of noise. 	Compared to the standard wavelet transform in \cref{subsubsec:stdWave}, the redundant is slightly worse for similar parameters w/r to \texttt{SNR} metric.\\
@@ -637,7 +637,15 @@ Figure \ref{windowaveletcomparer} shows the comparison between different wavelet
 
 	\appendix
 	
-	\section{Plots}
+	\section{Tables}
+	
+	\input{StdHard.tex}
+	
+	\input{StdSoft.tex}
+	
+	\input{RedHard.tex}
+	
+	\input{RedSoft.tex}
 	
 	\section{Listings}
 
