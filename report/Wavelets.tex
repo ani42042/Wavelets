@@ -435,7 +435,7 @@
 	\item Recombine the denoised color matrices into 1 image (multidimensional array)
 \end{enumerate}
 
-    \subsubsection{Question 2.7}
+    \subsubsection{Question 2.7} \label{subsubsec:RedTest}
 	Since we are dealing with image denoising, the wavelet families to test on are Daubechies or biorthogonal CDF's. \\
 
 	We will test the redundant wavelet-based denoising scheme on \cref{fig:Noisy}, for both hard and soft thresholding, for a range of $\delta = p T$'s, with $T$ the max of the wavelet coefficients of the 3 RGB colors and $p \in [0,1]$. 10 equidistant $p$'s were tested, obtained from matlab \texttt{linspace(\texttt{1e-3},1,10)}. \\
@@ -638,7 +638,8 @@ Figure \ref{windowaveletcomparer} shows the comparison between different wavelet
 	\appendix
 	
 	\section{Tables}
-	
+	The tables in this section are all of the results from the testing in \cref{subsubsec:RedTest,subsubsec:stdWave}. \\
+	To create theses tables a slightly modified version of function at \url{https://nl.mathworks.com/matlabcentral/fileexchange/4894-matrix2latex} was used.
 	\input{StdHard.tex}
 	
 	\input{StdSoft.tex}
@@ -648,6 +649,8 @@ Figure \ref{windowaveletcomparer} shows the comparison between different wavelet
 	\input{RedSoft.tex}
 	
 	\section{Listings}
+
+	Here is the matlab code referenced across the report.
 
 	\lstinputlisting[caption=Script for section \ref{subsec:UniVariate}, label={lst:ex2point1}]{../src/ex2point1.m}
 
