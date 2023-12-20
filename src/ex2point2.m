@@ -23,13 +23,12 @@ A_noise = imnoise(A,'salt & pepper',0.01);
 %A_noise = imnoise(A,'speckle');
 %A_noise = imnoise(A,"gaussian");
 SNR_noise = 10*log10(norm(double(A),'fro')/(norm(double(A)-double(A_noise),'fro')));
-%msNoise = sqrt(sum(sum(sum( (A_noise-A).^2 ))) / length(A(:)));
 msNoise = norm(double(A_noise)-double(A),'fro');
 % Plot the noisy image
 figure
 imshow(A_noise)
 
-%% Denoise image
+%% Denoise image for specific parameters
 p = 6e-3; thresholdType = 'Soft'; waveletType = 'db30'; 
 [A2,mserr,mserr_rel,compression_ratio,threshold,SNR] = denoising_image(A_noise,p,thresholdType,waveletType,A);
 
@@ -58,8 +57,6 @@ p = linspace(1e-3,1,10);
 % parameters to store results
 SNRMat = zeros(length(thesholding),length(wavelets),length(p));
 ThreshMat = zeros(length(thesholding),length(wavelets),length(p));
-% mprev = +inf;
-% BestImage = A_noise;
 %%
 n = length(wavelets)*length(thesholding); index = 1;
 progressbar
@@ -72,16 +69,12 @@ for i = 1:length(thesholding)
             [~,~,~,~,threshold,SNR] = denoising_image(A_noise,delta,thresholdType,wave,A);
             SNRMat(i,j,k) = SNR;
             ThreshMat(i,j,k) = threshold;
-            % if (mprev > mserr)
-            %     BestImage = A2;
-            % end
-            % mprev = mserr;
         end
         progressbar(index/n);
         index = index + 1;
     end
 end
-save Data.mat ThreshMat SNRMat
+%save Data.mat ThreshMat SNRMat
 %% plot best image
 load Data.mat
 
@@ -105,17 +98,20 @@ BestThresh = ThreshMat(ibest,jbest,kbest);
 figure
 imshow(BestImage)
 
+% function to apply hard thresholding
 function [c,I] = Hard_threshold(delta, c)
     I = find(abs(c) < delta);
     c(I) = 0;
 end
 
+% function to apply soft thresholding
 function [c, I] = Soft_threshold(delta,c)
     I = find(abs(c) < delta);
     c = sign(c).*(abs(c)-delta);
     c(I) = 0;
 end
 
+% function to desnoise an image
 function [A2,mserr,mserr_rel,compression_ratio,threshold,SNR] = denoising_image(A,p,threshtype,waveletType,A_correct)
     % if there is no A_correct, interprete as compression and not
     % denosing
@@ -141,12 +137,6 @@ function [A2,mserr,mserr_rel,compression_ratio,threshold,SNR] = denoising_image(
     T = max([max(abs(c1)), max(abs(c2)), max(abs(c3))]);
     %p = 1e-1;
     threshold = p*T;
-    %I1 = find(abs(c1) < threshold);
-    %c1(I1) = 0;
-    %I2 = find(abs(c2) < threshold);
-    %c2(I2) = 0;
-    %I3 = find(abs(c3) < threshold);
-    %c3(I3) = 0;
     if (strcmp("Hard",threshtype))
         [c1,I1] = Hard_threshold(threshold, c1);
         [c2,I2] = Hard_threshold(threshold, c2);
@@ -181,10 +171,7 @@ function [A2,mserr,mserr_rel,compression_ratio,threshold,SNR] = denoising_image(
     M = length(I1)+length(I2)+length(I3);
     compression_ratio = N / (N-M);
     
-    % Root mean square error
-    %mserr = sqrt(sum(sum(sum( (A2-A_correct).^2 ))) / length(A_correct(:)));
+    % error
     mserr = norm(double(A2)-double(A_correct),'fro');
-    % the norm of A(:) is equal to the so-called Frobenius norm
     mserr_rel = mserr / norm(double(A_correct), "fro");
-
 end

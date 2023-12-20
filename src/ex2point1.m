@@ -28,6 +28,7 @@ noise = epsilon*rand(size(y));
 ynoise = y + noise;
 [cnoise,lnoise] = wavedec(ynoise, 5, 'db2');
 
+% plot clean and noisy function
 figure
 plot(t,y)
 hold on
@@ -42,7 +43,7 @@ legend("$f(t)$","$f(t)+\epsilon \mathcal{U}(0,1)$",Interpreter="latex")
 %delta = 10e-4*T;
 delta = 1e-1;
 
-% change here what thresholding method wanted
+% change here to wanted thresholding method
 cnoiseInit = cnoise;
 [cnoise,I] = Hard_threshold(delta,cnoise);
 %[cnoise,I] = Soft_threshold(delta,cnoise);
@@ -66,7 +67,6 @@ y2 = waverec(cnoise, lnoise, 'db2');
 % Plot the error on a logarithmic scale. Experiment with the threshold
 % above and see what the effect is
 bias = mean(noise); %mean of uniform distrubution
-%noiseMean = mean(abs(noise));
 err = abs(y-y2+bias);
 errTotal = norm(err)
 errTotalnoise = norm(noise)
@@ -80,8 +80,7 @@ xlabel("$t$",Interpreter="latex");
 ylabel("Errors",Interpreter="latex");
 legend("$|f(t_i)-\hat{f}(t_i)+mean(noise)|$",Interpreter="latex")
 
-%% Question 2.3
-
+%% Question 2.3, finding best threshold for certain parameters
 x = linspace(-10,0,101);
 deltaList = 10.^x;
 errorList = zeros(size(deltaList));
@@ -96,9 +95,6 @@ for i = 1:length(deltaList)
     errorCoeffList(i) = mse(c,cnoise);
     % Reconstruct the signal
     y2 = waverec(cnoise, lnoise, 'db2');
-    % Plot the error on a logarithmic scale. Experiment with the threshold
-    % above and see what the effect is
-    %noiseMean = mean(abs(noise));
     F(i,:) = y2-bias;
     errorMat(i,:) = abs(y-y2+bias);
     %err = norm(abs(y-y2+bias));
@@ -110,6 +106,7 @@ end
 bestDelta = deltaList(indexCoeff)
 BestErrCoeff
 
+% Plot the error on a logarithmic scale. 
 figure
 semilogy(t, errorMat(indexCoeff,:))
 hold on
@@ -120,6 +117,7 @@ xlabel("$t$",Interpreter="latex");
 ylabel("Errors",Interpreter="latex");
 legend("$|f(t_i)-\hat{f}(t_i)+mean(noise)|$",Interpreter="latex")
 
+% plot best recontructed function
 figure
 plot(t,y)
 hold on
@@ -129,11 +127,13 @@ xlabel("$t$",Interpreter="latex");
 ylabel("function",Interpreter="latex");
 legend("$f(t)$","$\hat{f}(t)-mean(noise)$",Interpreter="latex")
 
+% function to apply hard thresholding
 function [c,I] = Hard_threshold(delta, c)
     I = find(abs(c) < delta);
     c(I) = 0;
 end
 
+% function to apply soft thresholding
 function [c, I] = Soft_threshold(delta,c)
     I = find(abs(c) < delta);
     c = sign(c).*(abs(c)-delta);

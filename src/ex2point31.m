@@ -5,7 +5,7 @@ t = linspace(-2, 2, 1008);
 y = abs(t) .*(2+cos(t)) .* sign(t);
 % Try a non-smooth function also:
 % y = abs(t) .* exp(t)
-%% decontruct signal, question 2.1
+%% decontruct signal
 
 % Compute its wavelet transform, four levels deep, using the Daubechies 2
 % wavelet.
@@ -13,8 +13,6 @@ Level = 4;
 wavelet = "db2";
 swc = swt(y, Level, wavelet);
 % Visualize the coefficients on a logarithmic scale.
-% Try to explain what you see! Experiment with other wavelets and, again,
-% try to understand the different results.
 figure
 semilogy(abs(swc(1,:)));
 %hold on
@@ -25,7 +23,7 @@ semilogy(abs(swc(1,:)));
 xlabel("$i$",Interpreter="latex");
 ylabel("$|c_i|$",Interpreter="latex");
 
-%% recontruct signal, task 2.2
+%% contruct noisy signal
 
 % apply wavelet transform on signal with added noise
 rng(42)
@@ -45,7 +43,7 @@ hold off
 xlabel("$t$",Interpreter="latex");
 ylabel("function",Interpreter="latex");
 legend("$f(t)$","$f(t)+\epsilon \mathcal{N}(0,1)$",Interpreter="latex")
-%%
+%% denoise function
 % Find small coefficents and set them to zero.
 %T = max(abs(cnoise));
 %delta = 10e-4*T;
@@ -60,6 +58,8 @@ err = abs(y-y2);
 errTotal = norm(err)
 errTotalnoise = norm(noise)
 %% plots
+
+% Plot the error on a logarithmic scale. 
 figure
 semilogy(t, err)
 hold on
@@ -70,6 +70,7 @@ xlabel("$t$",Interpreter="latex");
 ylabel("Errors",Interpreter="latex");
 legend("$|f(t_i)-\hat{f}(t_i)+mean(noise)|$",Interpreter="latex")
 
+% plot of clean and recontructed function
 figure
 plot(t,y)
 hold on
@@ -79,7 +80,7 @@ xlabel("$t$",Interpreter="latex");
 ylabel("function",Interpreter="latex");
 legend("$f(t)$","$\hat{f}(t)-mean(noise)$",Interpreter="latex")
 
-%% Question 2.3
+%% finding best threshold for certain parameters
 
 deltaList = linspace(0,1,400);
 
@@ -99,7 +100,7 @@ for l = 1:length(thresholdTypeList)
     end
 end
 
-%%
+%% plots
 
 ibest = 1;
 jbest = 1;
@@ -116,6 +117,7 @@ bestSNR
 [y2, BestTr] = denoise_func(ynoise,wavelet,deltaList(jbest),type,thresholdTypeList(ibest),Level);
 SNR = 10*log10(norm(y)/norm(y2-y));
 
+% plot best recontructed function
 figure
 plot(t,y)
 hold on
@@ -125,7 +127,7 @@ xlabel("$t$",Interpreter="latex");
 ylabel("function",Interpreter="latex");
 legend("$f(t)$","$\hat{f}(t)$",Interpreter="latex")
 
-%noiseMean = mean(abs(noise));
+% Plot the error on a logarithmic scale. 
 err = abs(y-y2);
 figure
 semilogy(t, err)
@@ -135,11 +137,13 @@ xlabel("$t$",Interpreter="latex");
 ylabel("Errors",Interpreter="latex");
 legend("$|f(t_i)-\hat{f}(t_i)|$",Interpreter="latex")
 
+% function to apply hard thresholding
 function [c,I] = Hard_threshold(delta, c)
     I = find(abs(c) < delta);
     c(I) = 0;
 end
 
+% function to apply soft thresholding
 function [c, I] = Soft_threshold(delta,c)
     I = find(abs(c) < delta);
     c = sign(c).*(abs(c)-delta);

@@ -6,3 +6,4 @@ report/*.out
 report/*.xml
 report/*.gz
 report/*.toc
+report/*.lol

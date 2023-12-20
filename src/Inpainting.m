@@ -1,5 +1,7 @@
 clear;
 close all;
+
+%% some parameters to test
 p=1e-2;
 threshold_type="hard"
 wavelets = ["db1","db4","sym4","coif4","bior4.4","rbio3.9"];
@@ -62,6 +64,7 @@ for w = 1:length(wavelets)
     % 
     % 
     % snr_zero(w)=10*log10(norm(A,"fro")/norm(A2-A,'fro'));
+    
     %interpolation
     Ared_extr = [Ared(row_start-1,col_start:col_end) ; Ared(row_end+1,col_start:col_end)];
     Agreen_extr = [Agreen(row_start-1,col_start:col_end) ; Agreen(row_end+1,col_start:col_end)];

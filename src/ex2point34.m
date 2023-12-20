@@ -5,14 +5,10 @@
 figure
 imshow(A)
 
-%%
+%% select part of image such that swt can be used
+
 % Recent versions of the wavelet toolbox can transform the tensor A.
 % It is generally safer to split the channels and do it manually
-%[c,l] = wavedec2(A, 4, 'bior4.4');
-
-%[ca1,chd1,cvd1,cdd1] = swt2(Ared(:,1:1348), 2,'db6');
-%[ca2,chd2,cvd2,cdd2]= swt2(Agreen(:,1:1348), 2,'db6');
-%[ca3,chd3,cvd3,cdd3] = swt2(Ablue(:,1:1348),2,'db6');
 
 % make sure the image is rows and colums can be divided by 2^Level
 Level = 4;
@@ -33,13 +29,12 @@ A_noise = A;
 A_noise(1:10:end,:)=0; A_noise(:,1:10:end)=0;
 
 SNR = 10*log10(norm(double(A),'fro')/(norm(double(A_noise)-double(A),'fro')));
-%msNoise = sqrt(sum(sum(sum( (A_noise-A).^2 ))) / length(A(:)));
 msNoise = norm(double(A_noise)-double(A),'fro');
 
 % Plot the noisy image
 figure
 imshow(A_noise)
-%%
+%% denoise image for specific parameters
 
 % parameters for decomposition
 wave = "db30"; rel_threhold = 6e-2;
@@ -89,8 +84,6 @@ TypeTransform = ["redundant"];
 % parameters to store results
 SNRMat = zeros(length(TypeTransform),length(thesholding),length(wavelets),length(p));
 ThreshMat = zeros(length(TypeTransform),length(thesholding),length(wavelets),length(p));
-% mprev = +inf;
-% BestImage = A_noise;
 progressbar
 index = 1; n = length(wavelets)*length(thesholding)*length(TypeTransform);
 for l = 1:length(TypeTransform)
@@ -105,10 +98,6 @@ for l = 1:length(TypeTransform)
                 SNRMat(l,i,j,k) = SNR;
                 %threshold
                 ThreshMat(l,i,j,k) = threshold;
-                % if (mprev > mserr)
-                %     BestImage = A2;
-                % end
-                % mprev = mserr;
             end
             progressbar(index/n);
             index = index + 1;
@@ -139,6 +128,7 @@ BestThresh = ThreshMat(l,ibest,jbest,kbest);
 figure
 imshow(BestImage)
 
+% function to desnoise an image
 function [A2,mserr,mserr_rel,threshold,SNR] = denoising_image(A,wave,rel_threhold,type,threshold_type,Level,A_correct)
     % The tensor contains red, green and blue components
     Ared = A(:,:,1);
@@ -167,8 +157,6 @@ function [A2,mserr,mserr_rel,threshold,SNR] = denoising_image(A,wave,rel_threhol
     % imshow(A2)
     
     % Root mean square error
-    %mserr = sqrt(sum(sum(sum( (A2-A_correct).^2 ))) / length(A_correct(:)));
     mserr = norm(double(A2)-double(A_correct),'fro');
-    % the norm of A(:) is equal to the so-called Frobenius norm
     mserr_rel = mserr / norm(double(A_correct), "fro");
 end

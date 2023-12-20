@@ -14,20 +14,12 @@ A_noise = imnoise(A,'salt & pepper',0.01);
 %A_noise = imnoise(A,'speckle');
 %A_noise = imnoise(A,"gaussian");
 SNR = 10*log10(norm(double(A),'fro')/(norm(double(A_noise)-double(A),'fro')));
-%msNoise = sqrt(sum(sum(sum( (A_noise-A).^2 ))) / length(A(:)));
 msNoise = norm(double(A_noise)-double(A),'fro');
 % Plot the noisy image
 figure
 imshow(A_noise)
 
-%%
-% Recent versions of the wavelet toolbox can transform the tensor A.
-% It is generally safer to split the channels and do it manually
-%[c,l] = wavedec2(A, 4, 'bior4.4');
-
-%[ca1,chd1,cvd1,cdd1] = swt2(Ared(:,1:1348), 2,'db6');
-%[ca2,chd2,cvd2,cdd2]= swt2(Agreen(:,1:1348), 2,'db6');
-%[ca3,chd3,cvd3,cdd3] = swt2(Ablue(:,1:1348),2,'db6');
+%% select part of image such that swt can be used
 
 % make sure the image is rows and colums can be divided by 2^Level
 Level = 4;
@@ -43,12 +35,12 @@ Ablue = A_noise(:,:,3);
 figure
 imshow(A_noise)
 
-%%
+%% denoise image for specific parameters
 
 % parameters for decomposition
 wave = "db30"; rel_threhold = 5e-3;
 type = "redundant";
-%type = "other";
+%type = "standard";
 threshold_type = "Soft";
 
 [A2red,A2green,A2blue,temp] = denoise_tensor(Ared,Agreen,Ablue,wave,rel_threhold,type,threshold_type,4);
@@ -86,16 +78,16 @@ Level = 2;
 type = "standard";
 %TypeTransform = ["redundant","standard"];
 TypeTransform = ["redundant"];
+
 % parameters to store results
 SNRMat = zeros(length(TypeTransform),length(thesholding),length(wavelets),length(p));
 ThreshMat = zeros(length(TypeTransform),length(thesholding),length(wavelets),length(p));
-% mprev = +inf;
-% BestImage = A_noise;
+
 progressbar
 index = 1; n = length(wavelets)*length(thesholding)*length(TypeTransform);
 for l = 1:length(TypeTransform)
     type = TypeTransform(l);
-    for i = 1:length(thesholding);
+    for i = 1:length(thesholding)
         threshold_type = thesholding(i);
         for j = 1:length(wavelets)
             wave = wavelets(j);
@@ -105,10 +97,6 @@ for l = 1:length(TypeTransform)
                 SNRMat(l,i,j,k) = SNR;
                 %threshold
                 ThreshMat(l,i,j,k) = threshold;
-                % if (mprev > mserr)
-                %     BestImage = A2;
-                % end
-                % mprev = mserr;
             end
             progressbar(index/n);
             index = index + 1;
@@ -132,6 +120,7 @@ for i = 1:size(SNRMat,2)
         end
     end
 end
+
 bestSNR
 BestThresh = ThreshMat(l,ibest,jbest,kbest);
 [BestImage,mserr,mserr_rel,thr,SNR] = denoising_image(A_noise,wavelets(jbest),p(kbest),TypeTransform(l),thesholding(ibest),Level,A);
@@ -139,6 +128,7 @@ BestThresh = ThreshMat(l,ibest,jbest,kbest);
 figure
 imshow(BestImage)
 
+% function to desnoise an image
 function [A2,mserr,mserr_rel,threshold,SNR] = denoising_image(A,wave,rel_threhold,type,threshold_type,Level,A_correct)
     % The tensor contains red, green and blue components
     Ared = A(:,:,1);
@@ -166,9 +156,7 @@ function [A2,mserr,mserr_rel,threshold,SNR] = denoising_image(A,wave,rel_threhol
     % figure
     % imshow(A2)
     
-    % Root mean square error
-    %mserr = sqrt(sum(sum(sum( (A2-A_correct).^2 ))) / length(A_correct(:)));
+    % error
     mserr = norm(double(A2)-double(A_correct),'fro');
-    % the norm of A(:) is equal to the so-called Frobenius norm
     mserr_rel = mserr / norm(double(A_correct), "fro");
 end

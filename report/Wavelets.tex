@@ -57,8 +57,17 @@
 \usepackage[bottom]{footmisc}
 \usepackage{comment}
 \usepackage{longtable}
+\usepackage{xurl}
 
-\usepackage{lipsum} % just for dummy text- not needed for a longtable
+\usepackage[numbered,framed]{matlab-prettifier}
+
+\lstset{
+	style              = Matlab-editor,
+	basicstyle         = \mlttfamily,
+	escapechar         = ",
+	mlshowsectionrules = true,
+}
+
 \fancyhead[C]{}
 \fancyhead[r]{}
 %\renewcommand{\footrulewidth}{1pt}
@@ -120,6 +129,8 @@
 	
 	\tableofcontents
 	
+	\lstlistoflistings
+	
 	\newpage
 
     \section{Wavelet-based denoising}
@@ -146,7 +157,7 @@
 	\label{fig:Coeff}
     \end{figure}
 
-    We can see in \footnote{To recreate \cref{fig:Coeff,fig:Delta=0,fig:Delta=0.1,fig:HardSoft,fig:OptiDelta} run \texttt{ex2point1.m}} \cref{fig:Coeff}, that the size of the coefficients decreases as $i$ increases. The meaning of this is that the coefficients of small size are of less importance to the reconstruction of the signal, and thus removing them will disproportionally remove noise.
+    We can see in \footnote{To recreate \cref{fig:Coeff,fig:Delta=0,fig:Delta=0.1,fig:HardSoft,fig:OptiDelta} run \texttt{ex2point1.m}, see \cref{lst:ex2point1}} \cref{fig:Coeff}, that the size of the coefficients decreases as $i$ increases. The meaning of this is that the coefficients of small size are of less importance to the reconstruction of the signal, and thus removing them will disproportionally remove noise.
 
     \subsubsection{Task 2.2} \label{subsubsec:thresholding}
 
@@ -343,7 +354,7 @@
 	\caption{Picture of a library, $\delta = 432.048$}
 	\label{sub:BibBad}
 \end{subfigure}
-	\caption{Picture of a library (taken from personal phone), for different values of hard threshold. Using BiorSplines4.4 as wavelet and decomposition level of 4}
+	\caption{Picture of a library \url{https://www.ad.nl/waterweg/bibliotheken-samen-in-actie-tegen-laaggeletterdheid~a3df7c36/126915796/}, for different values of hard threshold. Using BiorSplines4.4 as wavelet and decomposition level of 4}
 	\label{fig:Bib}
 \end{figure}
 
@@ -374,7 +385,7 @@
 			"rbio3.1", "rbio3.3", "rbio3.5", "rbio3.7"
 			"rbio3.9", "rbio4.4", "rbio5.5", "rbio6.8"}
 	\end{itemize}
-	1500 different combinations were tested, only the best will be shown (for obvious reasons) \footnote{To run the tests and recreate \cref{fig:Bib,fig:Noisy,fig:RecBib,fig:CusBib}, run \texttt{ex2point2.m}} \\
+	1500 different combinations were tested, only the best will be shown (for obvious reasons) \footnote{To run the tests and recreate \cref{fig:Bib,fig:Noisy,fig:RecBib,fig:CusBib}, run \texttt{ex2point2.m}, see \cref{lst:ex2point2}} \\
 	
 	The best parameters will be determined using the SNR metric (the higher the better), of course in practice the clean image is usually not available, so the "eyeball" norm would have to be use. The best parameters according to \texttt{SNR} are: \texttt{db45} for the wavelet, threshold of 4.902 and a $\texttt{SNR} = \texttt{9.8}$, using soft thresholding. See \cref{fig:RecBib} for the resulting recontructed image. It still looks quite noisy figure. The results are pretty underwhelming.
 
@@ -440,7 +451,7 @@ The tested wavelets range from (For 4 level deep)
 		"rbio3.1", "rbio3.3", "rbio3.5", "rbio3.7"
 		"rbio3.9", "rbio4.4", "rbio5.5", "rbio6.8"}
 \end{itemize}
-1500 different combinations were tested, only the best for the redundant scheme will be shown (for obvious reasons) \footnote{To run the tests and recreate \cref{fig:RecRed,fig:RecCus}, run \texttt{ex2point3.m}}. The quality metric is \texttt{SNR} (The higher the better), see \cref{eq:SNR}.\\
+1500 different combinations were tested, only the best for the redundant scheme will be shown (for obvious reasons) \footnote{To run the tests and recreate \cref{fig:RecRed,fig:RecCus}, run \texttt{ex2point3.m}, see \cref{lst:ex2point3}}. The quality metric is \texttt{SNR} (The higher the better), see \cref{eq:SNR}.\\
 
 %The best parameters for standard wavelet transform are: threshold of 42, using hard thesholding, wavelet is \texttt{"db1"} .We get \texttt{SNR = }, see \cref{sub:RecStd}.\\
 The best parameters for redundant wavelet transform are: threshold of 1.508, using soft thesholding, wavelet is \texttt{"db45"}.We get \texttt{SNR = 9.49}, see \cref{fig:RecRed}. The resulting figure still has quite a bit of noise. 	Compared to the standard wavelet transform in \cref{subsubsec:stdWave}, the redundant is slightly worse for similar parameters w/r to \texttt{SNR} metric.\\
@@ -463,13 +474,13 @@ The best parameters for redundant wavelet transform are: threshold of 1.508, usi
 
 	 When comparing \cref{fig:RecCus,fig:RecRed}, even though \cref{fig:RecRed} has the higher \texttt{SNR}, \cref{fig:RecCus} looks like it has less noise. This is due to the fact that the additional blur and lowering in quality is too much of a price to pay to denoise properly, according to \texttt{SNR}.
 
-    \subsubsection{Question 2.8}
+    \subsubsection{Question 2.8} \label{subsubsec:SignNew}
 
 	Let us take \cref{eq:func} again, this time however for $N=1008$ points in the interval $[-2,2]$ (obtained via matlab \texttt{linspace(-2,2,1008)}). Noise is added to the signal 
 	\begin{equation} \label{eq:funcNoise}
 		\tilde{f_i} = f_i + \epsilon \mathcal{N}(0,1)
 	\end{equation}
-	($\hat{f}$ is the reconstructed $\tilde{f}$). We chose $\epsilon = \texttt{5e-1}$. See \footnote{To recreate \cref{fig:FuncNoisy,fig:FuncRecStd,fig:FuncRecRed}, run \texttt{ex2point31.m}} \cref{fig:FuncNoisy} for signal plot.\\
+	($\hat{f}$ is the reconstructed $\tilde{f}$). We chose $\epsilon = \texttt{5e-1}$. See \footnote{To recreate \cref{fig:FuncNoisy,fig:FuncRecStd,fig:FuncRecRed}, run \texttt{ex2point31.m}, see \cref{lst:ex2point31}} \cref{fig:FuncNoisy} for signal plot.\\
 	
 	On this slightly modified signal both redundant and standard wavelet transform will be tested, for wavelet \texttt{db2}, Level of decomposition 4, both hard and soft thresholding and a range of $\delta = p T$'s, with $T$ the max of the wavelet coefficients and $p \in [0,1]$. 400 equidistant $p$'s were tested, obtained from matlab \texttt{linspace(0,1,400)}. Boundary conditions used is still: Symmetrization (half-point). \\
 	
@@ -527,13 +538,13 @@ The best parameters for redundant wavelet transform are: threshold of 1.508, usi
 	We observe that reconstruction via redundant transform gives a smother function. And that \texttt{SNR} for redundant is higher then for standard, 12.801 vs 12.55. \\
 	These results seem to point to the fact that redundant wavelet transform is better for denoising, this is to be expected since redundant transform does not do any downsampling, only upsampling.
 	This means that unlike the standard wavelet transform which is critically sampled, the redundant transform has additional (redundant) information, which has the potential to have less loss of signal information during the thresholding.
-    \subsubsection{Task 2.9}
+    \subsubsection{Task 2.9} \label{subsubsec:Grid}
 
 	Now finally let us test redundant wavelet transform on different kind of noise. Suppose $A$ represents our image, we apply
 	\begin{equation*}
 		\texttt{A(1:10:end,:)=0; A(:,1:10:end)=0;}
 	\end{equation*}
-	This creates a grid of lines every tenth row and every tenth column, the \texttt{SNR = 3.61} (\cref{eq:SNR}). See \footnote{To recreate \cref{fig:BibGrid,fig:BibGridRec,fig:BibGridRec2}, run \texttt{ex2point34.m}} \cref{fig:BibGrid}.\\
+	This creates a grid of lines every tenth row and every tenth column, the \texttt{SNR = 3.61} (\cref{eq:SNR}). See \footnote{To recreate \cref{fig:BibGrid,fig:BibGridRec,fig:BibGridRec2}, run \texttt{ex2point34.m}, see \cref{lst:ex2point34}} \cref{fig:BibGrid}.\\
 	
 	Now lets try to apply the denoising scheme from \cref{subsubsec:RedDen}. We test the following parameters: 
 	\begin{itemize}
@@ -574,7 +585,7 @@ The best parameters for redundant wavelet transform are: threshold of 1.508, usi
 We chose the previous image for the inpainting algorithm. From different experiments we chose 3 specific areas where the reconstruction was particularly interesting. The first area is the homogeneous blue sky. The second area is a window within the three windows and lastly we attempted to remove the all letters from "Bibliotheek" and pretended this was written on it. The correctness of the implementation was checked visually as well as the based on SNR sanity check. After masking the image, we chose spline interpolation to fill the zeros as initial guess. 
 \subsubsection{Question 3.2}
 
-Figure \ref{softhardinpainting} highlights the difference between soft and hard thresholding in the case of the removal of the letter O. Soft thresholding gives slight but not significant better reconstruction based on SNR. The main difference however lies in the fact that soft thresholding performs equally well after inpainting masked matrix without interpolation and inpainting after interpolation. The hard thresholding had lower SNR for the case of inpainting the masked uninterpolated matrix. This is attributed to the fact that hard thresholding leaves the coefficients beyond the $\delta$ range unchanged while it shrinks those within the range. Since soft thresholding also shrinks the bigger coefficients outside the $\delta$ range, denoising with zeros as the missing elements removes noise in the outer regions aswell. As explained in chapter 10, the hard part was to find optimal threshold. Therefore a visual inspection was performed as the threshold was gradually decreased to come up with descent reconstruction.
+\footnote{To recreate \cref{softhardinpainting,WorkingRed,NonRedundBib,windowaveletcomparer}, run \texttt{Inpainting.m}, see \cref{lst:Inpainting}} Figure \ref{softhardinpainting} highlights the difference between soft and hard thresholding in the case of the removal of the letter O. Soft thresholding gives slight but not significant better reconstruction based on SNR. The main difference however lies in the fact that soft thresholding performs equally well after inpainting masked matrix without interpolation and inpainting after interpolation. The hard thresholding had lower SNR for the case of inpainting the masked uninterpolated matrix. This is attributed to the fact that hard thresholding leaves the coefficients beyond the $\delta$ range unchanged while it shrinks those within the range. Since soft thresholding also shrinks the bigger coefficients outside the $\delta$ range, denoising with zeros as the missing elements removes noise in the outer regions aswell. As explained in chapter 10, the hard part was to find optimal threshold. Therefore a visual inspection was performed as the threshold was gradually decreased to come up with descent reconstruction.
 
 
 
@@ -597,14 +608,14 @@ Figure \ref{softhardinpainting} highlights the difference between soft and hard 
 \subsubsection{Question 3.3}
 We performed the inpainting algorithm using the discrete stationary wavelet transform to compare redundant and non-redundant denoising. Firslty we observed that the reundant inpainting gave same results visually when the same masked region was not interpolated. This is was done out of expectation that it will performally equally well since downsampling is not involved. However the SNR was lower than the interpolated case. The redundant inpainting had slightly less lower performance (1dB difference) based on SNR but was visually much superior to the non-rendundant inpainting as seen in figures \ref{WorkingRed}
 and \ref{NonRedundBib}.
-\begin{figure}[htb]
+\begin{figure}[H]
 	\centering % <-- added
 	\includegraphics[width=0.9\linewidth]{Images/Redundant_all_letters.png}
 	\caption{Removing "Bibliotheek" with  redundant wavelet transform}
 	\label{WorkingRed}
 \end{figure}
 
-\begin{figure}[htb]
+\begin{figure}[H]
 	\centering % <-- added
 	\includegraphics[width=1.1\linewidth]{Images/non-RedundantAllLeters.png}
 	\caption{Removing "Bibliotheek" with biorthogonal and hard thresholding}
@@ -615,7 +626,7 @@ and \ref{NonRedundBib}.
 \subsubsection{Question 3.4}
 Figure \ref{windowaveletcomparer} shows the comparison between different wavelet families in the case of inpainting in a window inside the middle window. It can be seen that both haar wavelet and biorthogonal spline wavel 4.4 perform than the rest in terms of SNR. The reverse biothogonal spline has the lowest SNR. The highest SNR was achieved in the case of inpainting around homogeneous blue sky. The SNR was 40 dB for all wavelet families.
 
-\begin{figure}[htb]
+\begin{figure}[H]
 	\centering % <-- added
 	\includegraphics[width=0.7\linewidth]{Images/wavelet_comparison_window.png}
 	\caption{Comparison of different wavelet families}
@@ -626,25 +637,28 @@ Figure \ref{windowaveletcomparer} shows the comparison between different wavelet
 
 	\appendix
 	
-	\section{Tables}
+	\section{Plots}
 	
-	\begin{longtable}{| p{.20\textwidth} | p{.80\textwidth} |} 
-	\hline
-	foo & bar \\ \hline 
-	foo & bar \\ \hline
-	foo & bar \\ \hline
-	foo & bar \\ \hline
-	foo & bar \\ \hline
-	foo & bar \\ \hline
-	foo & bar \\ \hline
-	foo & bar \\ \hline
-	foo & bar \\ \hline
-	foo & bar \\ \hline
-	foo & bar \\ \hline
-	\caption{Your caption here} % needs to go inside longtable environment
-	\label{tab:myfirstlongtable}
-\end{longtable}
+	\section{Listings}
 
-	\section{Code}
+	\lstinputlisting[caption=Script for section \ref{subsec:UniVariate}, label={lst:ex2point1}]{../src/ex2point1.m}
+
+	\lstinputlisting[caption=Script for section \ref{subsubsec:Denoising}, label={lst:ex2point2}]{../src/ex2point2.m}
+	
+	\lstinputlisting[caption=Script for section \ref{subsubsec:RedDen}, label={lst:ex2point3}]{../src/ex2point3.m}
+	
+	\lstinputlisting[caption=Script for section \ref{subsubsec:SignNew}, label={lst:ex2point31}]{../src/ex2point31.m}
+
+	\lstinputlisting[caption=Script for section \ref{subsubsec:Grid}, label={lst:ex2point34}]{../src/ex2point34.m}
+	
+	\lstinputlisting[caption=Script for section \ref{sec:Inpainting}, label={lst:Inpainting}]{../src/Inpainting.m}
+	
+	\lstinputlisting[caption=Function to denoise image (RGB), label={lst:DenoiseTensor}]{../src/denoise_tensor.m}
+
+	\lstinputlisting[caption=Function to denoise function, label={lst:DenoiseFunc}]{../src/denoise_func.m}
+		
+	\lstinputlisting[caption=Function to show progress bar taken from \url{https://nl.mathworks.com/matlabcentral/fileexchange/6922-progressbar}, label={lst:progressbar}]{../src/progressbar.m}
+
+%https://www.google.com/search?sca_esv=592538007&rlz=1C1GCEJ_enNL1007NL1007&q=bibliotheek+schiedam&tbm=isch&source=lnms&sa=X&ved=2ahUKEwj1yKaeqJ6DAxVkxgIHHSrVB1AQ0pQJegQIFRAB&biw=1536&bih=738&dpr=1.25#imgrc=_0fhKA49ki2DfM
 
  \end{document}
