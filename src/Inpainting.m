@@ -13,8 +13,10 @@ A=im2double(A);
 % figure
 % imshow(A)
 snr_zero =[];snr_guess =[];snr_recon = [];
-
+M = length(wavelets)*iterations;
 %%
+index = 1;
+progressbar
 for w = 1:length(wavelets) 
     wavelet = wavelets(w)
     Ared = A(:,:,1);
@@ -64,7 +66,7 @@ for w = 1:length(wavelets)
     % 
     % 
     % snr_zero(w)=10*log10(norm(A,"fro")/norm(A2-A,'fro'));
-    
+
     %interpolation
     Ared_extr = [Ared(row_start-1,col_start:col_end) ; Ared(row_end+1,col_start:col_end)];
     Agreen_extr = [Agreen(row_start-1,col_start:col_end) ; Agreen(row_end+1,col_start:col_end)];
@@ -81,29 +83,29 @@ for w = 1:length(wavelets)
     
     % Inpainting algorithm
     [Bred_prev,Bgreen_prev,Bblue_prev] = denoise_tensor(Ared_guess,Agreen_guess,Ablue_guess,wavelet,p,type,threshold_type);
-    A2 = zeros(size(A));
     A2(:,:,1) = Bred_prev;
     A2(:,:,2) = Bgreen_prev;
     A2(:,:,3) = Bblue_prev;
-    figure
-    imshow(A2);
+    %figure
+    %imshow(A2);
     snr_guess(w)=10*log10(norm(A,"fro")/norm(A2-A,'fro'));
     % iterations  = 200;
     for i = 1:iterations
-    
         [Bred_next,Bgreen_next,Bblue_next] = denoise_tensor(Bred_prev,Bgreen_prev,Bblue_prev,wavelet,p,type,threshold_type);
         Bred_next(mask_compl)=0;Bgreen_next(mask_compl)=0;Bblue_next(mask_compl)=0;
         Bred_prev = Ared + Bred_next;Bgreen_prev = Agreen + Bgreen_next;Bblue_prev = Ablue + Bblue_next;
+        progressbar(index/M);
+        index = index + 1;
     end
     
     A2 = zeros(size(A));
     A2(:,:,1) = Bred_prev;
     A2(:,:,2) = Bgreen_prev;
     A2(:,:,3) = Bblue_prev;
-    figure
-    imshow(A2)
-    'recon'
-    snr_recon(w)=10*log10(norm(A,"fro")/norm(A2-A,'fro'));
+    %figure
+    %imshow(A2)
+    %'recon'
+    %snr_recon(w)=10*log10(norm(A,"fro")/norm(A2-A,'fro'));
 end
 % figure
 % imshow(A2)
